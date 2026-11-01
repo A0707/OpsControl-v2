@@ -1,0 +1,6 @@
+198.51.100.7 - - [27/Oct/2026:07:20:00 +0100] "GET /catalogue?page=2 HTTP/1.1" 200 5120 "-" "Mozilla/5.0 (X11; Linux x86_64)"
+198.51.100.7 - - [27/Oct/2026:07:20:10 +0100] "GET /catalogue?page=3 HTTP/1.1" 200 5022 "https://shop.example.test/catalogue" "Mozilla/5.0 (X11; Linux x86_64)"
+198.51.100.4 - - [27/Oct/2026:07:20:20 +0100] "GET /login?user=admin&password=SECRET HTTP/1.1" 403 199 "-" "sqlmap/1.7"
+2001:db8::50 - - [27/Oct/2026:07:20:30 +0100] "POST /api/orders HTTP/1.1" 503 299 "-" "okhttp/4.12.0"
+198.51.100.8 - - [27/Oct/2026:07:20:40 +0100] "GET /api/orders/9 HTTP/1.1" 500 512 "-" "Mozilla/5.0"
+198.51.100.7 - - [27/Oct/2026:07:21:00 +0100] "GET /catalogue HTTP/1.1" 200 4980 "-" "Mozilla/5.0 (X11; Linux x86_64)"

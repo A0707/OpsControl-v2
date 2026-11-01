@@ -1,0 +1,1 @@
+{-2m} [:error] [pid 2102:tid 1420] [client 198.51.100.9:50010] [client 198.51.100.9] ModSecurity: Access denied with code 403 (phase 1). [id "920350"] [msg "Host header is a numeric IP address"] [hostname "192.0.2.10"] [uri "/"] [unique_id "A1"]

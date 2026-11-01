@@ -1,0 +1,474 @@
+[
+ {
+  "ghsa_id": "GHSA-7875-c8px-7q5f",
+  "cve_id": "CVE-2026-93682",
+  "url": "https://api.github.com/repos/php/php-src/security-advisories/GHSA-7875-c8px-7q5f",
+  "html_url": "https://github.com/php/php-src/security/advisories/GHSA-7875-c8px-7q5f",
+  "summary": "Out-of-bounds read in the HTTP stream wrapper when following a redirect with an empty Location header",
+  "description": "### Summary\r\n\r\nWhen the HTTP stream wrapper follows a redirect and the response carries a `Location` header with an empty value, the redirect code reads one byte past the end of the heap buffer holding the location. The value of that out-of-bounds byte decides which redirect target is built, so a malicious server controls whether the client is sent to the host root or to the current directory.\r\n\r\n### Details\r\n\r\nSince the fix for GHSA-52jp-hrpf-2jff (CVE-2025-1861), `php_stream_http_response_headers_parse()` stores the `Location` value in a heap buffer of exactly `location_len + 1` bytes:\r\n\r\nhttps://github.com/php/php-src/blob/a66f30d78e10773048720b4b5f279136fdd0a433/ext/standard/http_fopen_wrapper.c#L295-L301\r\n\r\nFor an empty header value that is a single byte holding only the NUL terminator. The redirect handling in `php_stream_url_wrap_http_ex()` treats any location that does not start with `/` as a relative path and dereferences the second byte to decide whether to join it with the directory of the current request path:\r\n\r\nhttps://github.com/php/php-src/blob/a66f30d78e10773048720b4b5f279136fdd0a433/ext/standard/http_fopen_wrapper.c#L1055-L1063\r\n\r\n`*(header_info.location+1)` is one byte after the allocation.\r\n\r\nBefore CVE-2025-1861 was fixed, the location lived in a fixed-size `char location[HTTP_HEADER_BLOCK_SIZE]` stack buffer and the same read stayed in bounds. The bug therefore exists only in 8.1.32+, 8.2.28+, 8.3.18+, 8.4.5+ and all 8.5 releases.\r\n\r\nThe fix replaces `strlen(header_info.location)` with `header_info.location_len` and guards the second-byte read with the length, so an empty `Location` deterministically redirects to the host root. It was submitted and merged publicly, outside the security process, in https://github.com/php/php-src/pull/23467. A follow-up in https://github.com/php/php-src/pull/23521 corrected the guard from `location_len > 0` to `location_len > 1`, restoring the long-standing resolution of a single-character relative `Location`.\r\n\r\n### PoC\r\n\r\nA server answering `HTTP/1.1 302 Found\\r\\nLocation:\\r\\nContent-Length: 0\\r\\n\\r\\n` to this client:\r\n\r\n```php\r\n<?php\r\n$ctx = stream_context_create(['http' => ['follow_location' => 1]]);\r\nfile_get_contents(\"http://host/a/b\", false, $ctx);\r\n```\r\n\r\nThe next request goes to `/` when the stray byte happens to be NUL and to `/a//` otherwise. Under Valgrind with `USE_ZEND_ALLOC=0`:\r\n\r\n```\r\nInvalid read of size 1\r\n   at php_stream_url_wrap_http_ex (http_fopen_wrapper.c:1044)\r\n   by php_stream_url_wrap_http (http_fopen_wrapper.c:1186)\r\n   by _php_stream_open_wrapper_ex (streams.c:2206)\r\n   by zif_file_get_contents (file.c:426)\r\n Address is 0 bytes after a block of size 1 alloc'd\r\n   at malloc\r\n   by _emalloc\r\n   by php_stream_http_response_headers_parse (http_fopen_wrapper.c:268)\r\n```\r\n\r\nThe regression tests are `ext/standard/tests/http/http_empty_location_redirect.phpt` and `http_single_char_location_redirect.phpt`.\r\n\r\n### Impact\r\n\r\nAn attacker who controls a server that a PHP application fetches from, or who can redirect such a request there, triggers a one-byte heap over-read. The byte is never returned to the attacker; it only selects between two redirect targets, so at most one bit, whether the byte is zero, is observable through the request path the server sees. Under the Zend memory manager the one-byte allocation sits in an 8-byte bin, so the read does not crash the process. The practical effect is a non-deterministic redirect target and undefined behaviour reported by ASan and Valgrind.\r\n",
+  "severity": "medium",
+  "identifiers": [
+   {
+    "value": "GHSA-7875-c8px-7q5f",
+    "type": "GHSA"
+   },
+   {
+    "value": "CVE-2026-93682",
+    "type": "CVE"
+   }
+  ],
+  "state": "published",
+  "created_at": null,
+  "updated_at": "2026-09-25T19:54:11Z",
+  "published_at": "2026-09-24T10:07:25Z",
+  "closed_at": null,
+  "withdrawn_at": null,
+  "submission": null,
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "ext-standard"
+    },
+    "vulnerable_version_range": "<8.2.34",
+    "patched_versions": "8.2.34",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "ext-standard"
+    },
+    "vulnerable_version_range": "<8.3.35",
+    "patched_versions": "8.3.35",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "ext-standard"
+    },
+    "vulnerable_version_range": "<8.4.26",
+    "patched_versions": "8.4.26",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "ext-standard"
+    },
+    "vulnerable_version_range": "<8.5.11",
+    "patched_versions": "8.5.11",
+    "vulnerable_functions": []
+   }
+  ],
+  "cvss_severities": {
+   "cvss_v3": {
+    "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "score": 5.3
+   },
+   "cvss_v4": {
+    "vector_string": null,
+    "score": null
+   }
+  },
+  "cwes": [
+   {
+    "cwe_id": "CWE-125",
+    "name": "Out-of-bounds Read"
+   }
+  ],
+  "cwe_ids": [
+   "CWE-125"
+  ],
+  "collaborating_teams": null,
+  "private_fork": null,
+  "comments": 0,
+  "cvss": {
+   "vector_string": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:L/I:N/A:N",
+   "score": 5.3
+  }
+ },
+ {
+  "ghsa_id": "GHSA-w8hw-w9fx-j79w",
+  "cve_id": "CVE-2026-109618",
+  "url": "https://api.github.com/repos/php/php-src/security-advisories/GHSA-w8hw-w9fx-j79w",
+  "html_url": "https://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w",
+  "summary": "RCE via OOM corruption",
+  "description": "## Summary\r\n\r\nPHP uses `longjmp()` for out-of-memory (OOM) errors to exit the current context and abort handling of the request. In some contexts, request memory is temporarily reachable before it is fully initialized. If any allocation fails at that point, PHP does not properly account for the early exit and leaves the request memory in an invalid state. The failed allocation does not need to be related to the invalid memory. The request shutdown procedure may then read or branch on it. Multiple OOM strategies can consistently trigger this condition and lead to remote code execution (RCE).\r\n\r\n## Vulnerability\r\n\r\n### OOM strategies\r\n\r\nSeveral multipart parsing problems can let a request reach OOM while remaining within its apparent PHP limits:\r\n\r\n- A multipart request without a usable declared content length may pass the initial `post_max_size` check and continue supplying decoded body data.\r\n- A multipart part can contain an unrestricted number of headers. Representing these headers inside PHP can use substantially more memory than their wire representation, allowing a request within `post_max_size` to exhaust the normal `memory_limit`.\r\n- Empty file controls do not count towards `max_file_uploads` but still create the normal file metadata arrays. Nested field names multiply the generated array work.\r\n\r\nOOM can also be reached in application-specific ways when attacker-controlled input causes a sufficiently large allocation or repeated memory use.\r\n\r\n### Susceptibility\r\n\r\nApache mod_php unconditionally invokes the request shutdown procedure, even when request startup has failed. During request startup, automatic body parsing can exhaust the configured memory limit and exit the request in a context where state is temporarily invalid. Shutdown then processes this invalid state. This happens entirely before any application-specific code begins execution.\r\n\r\nFPM exits the child when request startup fails. This prevents consumption of the invalid state and removes the child from the pool. After normal startup, OOM may still be reached in a context failing to account for an early exit, with the invalid state being processed during request shutdown. Source analysis therefore supports FPM as a susceptible, though no complete FPM exploit has been demonstrated for this SAPI.\r\n\r\nSource analysis indicates that FrankenPHP, analogous to Apache mod_php, calls the request shutdown procedure unconditionally, making it likely susceptible to application-independent attacks. LSAPI models FPM, with application-specific exploits being likely but unvalidated.\r\n\r\n## Mitigation\r\n\r\nThe patch removes `longjmp()` for OOM, avoiding an early exit out of contexts that do not properly account for it. It is replaced with a delayed, graceful soft OOM triggered at the next VM safe point, and an immediate hard OOM using `_exit()` if memory consumption reaches a second, higher threshold. The shutdown procedure will no longer see invalid state, and PHP's normal ability to limit memory consumption is retained.\r\n\r\n> [!WARNING]\r\n> Updating to a PHP release containing the patch to this vulnerability is the _only_ complete mitigation.\r\n\r\nFor installations that cannot update, setting and enforcing `memory_limit=-1` administratively is the primary configuration mitigation. It removes the predictable per-request limit that enables the confirmed exploit with a controllable OOM. This is not a complete mitigation. If `mmap()` or another underlying allocation fails, PHP can still use `longjmp()` while incomplete request memory is reachable. Restart every PHP worker and confirm that no pool, directory or application setting restores a finite PHP memory limit.\r\n\r\nKeep `post_max_size` conservative and independently enforce the decoded request size at the frontend. Reduce `max_input_nesting_level`, and bound the number of input variables, multipart parts, headers within each part and uploads. These controls reduce hard OOM and denial of service risk even after applying the patch, but do not replace updating. If the application does not use multipart form data, block such requests at the frontend before they reach PHP.\r\n\r\nA container or cgroup memory limit (`memory.max`) may provide an alternative to PHP's own `memory_limit` with some limitations. It is not guaranteed to prevent allocation failure and is not a complete mitigation. For example, killing a container or cgroup can also kill the master and every worker, unless each worker has its own group. Killing one FPM child fails only its current requests and FPM's master replaces it quickly. Do _not_ use `RLIMIT_AS` or `RLIMIT_DATA`, as these will cause `mmap()` to fail once the memory limit is reached, triggering the vulnerable `longjmp()` path.\r\n\r\n**Important**: Make sure to also follow the remediation advice from the related report.\r\nhttps://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp\r\n\r\n## Impact and reliability\r\n\r\nThe confirmed impact is unauthenticated remote code execution as the web worker account. Complete remote code execution was validated over HTTP against mod_php with default PHP input and memory limits and normal prefork configurations with multiple workers. Additional workers and unrelated traffic can increase the required number of attempts but do not remove the condition. Exploit portability and reliability depend on the PHP build, extensions, frontend behavior and allocator layout.\r\n",
+  "severity": "critical",
+  "identifiers": [
+   {
+    "value": "GHSA-w8hw-w9fx-j79w",
+    "type": "GHSA"
+   },
+   {
+    "value": "CVE-2026-109618",
+    "type": "CVE"
+   }
+  ],
+  "state": "published",
+  "created_at": null,
+  "updated_at": "2026-10-21T13:34:25Z",
+  "published_at": "2026-10-21T13:34:25Z",
+  "closed_at": null,
+  "withdrawn_at": null,
+  "submission": null,
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "php-src"
+    },
+    "vulnerable_version_range": "< 8.2.35",
+    "patched_versions": "8.2.35",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "php-src"
+    },
+    "vulnerable_version_range": "< 8.3.36",
+    "patched_versions": "8.3.36",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "php-src"
+    },
+    "vulnerable_version_range": "< 8.4.27",
+    "patched_versions": "8.4.27",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "php-src"
+    },
+    "vulnerable_version_range": "< 8.5.12",
+    "patched_versions": "8.5.12",
+    "vulnerable_functions": []
+   }
+  ],
+  "cvss_severities": {
+   "cvss_v3": {
+    "vector_string": null,
+    "score": null
+   },
+   "cvss_v4": {
+    "vector_string": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N",
+    "score": 9.2
+   }
+  },
+  "cwes": [
+   {
+    "cwe_id": "CWE-416",
+    "name": "Use After Free"
+   },
+   {
+    "cwe_id": "CWE-755",
+    "name": "Improper Handling of Exceptional Conditions"
+   },
+   {
+    "cwe_id": "CWE-824",
+    "name": "Access of Uninitialized Pointer"
+   },
+   {
+    "cwe_id": "CWE-1325",
+    "name": "Improperly Controlled Sequential Memory Allocation"
+   },
+   {
+    "cwe_id": "CWE-1419",
+    "name": "Incorrect Initialization of Resource"
+   }
+  ],
+  "cwe_ids": [
+   "CWE-416",
+   "CWE-755",
+   "CWE-824",
+   "CWE-1325",
+   "CWE-1419"
+  ],
+  "collaborating_teams": null,
+  "private_fork": null,
+  "comments": 6,
+  "cvss": {
+   "vector_string": null,
+   "score": null
+  }
+ },
+ {
+  "ghsa_id": "GHSA-6wmf-4rv5-p3rp",
+  "cve_id": "CVE-2026-109619",
+  "url": "https://api.github.com/repos/php/php-src/security-advisories/GHSA-6wmf-4rv5-p3rp",
+  "html_url": "https://github.com/php/php-src/security/advisories/GHSA-6wmf-4rv5-p3rp",
+  "summary": "RCE via stale global state",
+  "description": "## Summary\r\n\r\nPHP contains various global state, such as error, session, object and extension state that is retained by a worker but points to memory owned by one request. That state must be reset before the request memory is released. Some input, configuration, session and error handling operations run before normal initialization of the next request. They inadvertently access stale state not reset by the previous request before initialization has a chance to replace it, causing a use after free. A strategically crafted heap layout can produce full remote code execution (RCE).\r\n\r\nState can survive for more than one reason. A fatal error, including one caused by memory exhaustion, can abandon an operation before it performs its matching reset. A warning or other nonfatal diagnostic can also repopulate error state after that state was already cleared during shutdown. The request heap is then freed while the worker global field still refers to it. A later operation that runs before normal request initialization can consume the stale value.\r\n\r\nSuccessful exploitation of this vulnerability requires both a producer and a consumer. The producer is a PHP operation that stores state owned by one request in a location PHP can access later in a subsequent request. The consumer is a subsequent PHP operation that reads, frees, branches or otherwise acts on the stale state previously stored by the producer.\r\n\r\nA concrete vulnerability would arise under the following conditions:\r\n\r\n1. A reachable PHP operation stores request-owned state in a globally accessible location, acting as the producer.\r\n2. The state is not reset, or another operation repopulates it after its normal reset.\r\n3. PHP releases the request memory while the persistent worker retains the referring global state.\r\n4. The same worker handles another request.\r\n5. A PHP operation reads, frees, branches or otherwise acts on the stale state before normal request initialization resets it, acting as the consumer.\r\n\r\nThe demonstrated producing and consuming operations occur in different HTTP requests handled by the same worker. The exact affected versions, configuration and mitigations depend on the internal state affected by the producing operation.\r\n\r\n## Vulnerability\r\n\r\n### Producers\r\n\r\nA producing operation becomes dangerous when its request-owned state remains published after the request heap is freed. A fatal error can cause this by abandoning the operation before it resets the state. Fatal interruptions include parse and compile failures, uncaught errors, failure of `require`, and `Maximum execution time exceeded`.\r\n\r\nOOM can provide the same interruption when an affected error, exception, object or extension state was already published.\r\n\r\nEven a nonfatal diagnostic from extension or server cleanup during a later shutdown stage can repopulate new request-owned error information to the global state.\r\n\r\n### Consumers\r\n\r\nThere are two confirmed consumers before normal initialization.\r\n\r\n#### INI diagnostics before request initialization\r\n\r\nA warning, notice or deprecation during initialization can consume stale error state. It does not need to be fatal, displayed or logged. Such a warning may be raised when applying invalid or deprecated INI settings before ordinary executor initialization. Examples include:\r\n\r\n- Deterministic deprecations such as `auto_detect_line_endings=1`, a `filter.default` value other than the default, PHP 8.3+ legacy `assert.*` settings, PHP 8.4+ legacy session settings, and PHP 8.5 `report_memleaks=0` or nonzero `intl.error_level`.\r\n- Explicitly configured `mbstring.http_input`, `mbstring.http_output`, `mbstring.internal_encoding`, `iconv.input_encoding`, `iconv.output_encoding` or `iconv.internal_encoding`.\r\n- Invalid or conflicting `zend.assertions`, `memory_limit`, `date.timezone`, DBA, EXIF, mail, OpenSSL, zlib and loaded extension values.\r\n- Malformed or overflowing quantities, including invalid `memory_limit`, body size, input, timeout, stack and extension values on PHP 8.2+.\r\n- Configured log, mail, session or SOAP cache paths rejected under `open_basedir`.\r\n\r\nGlobal state is accessed before PHP decides whether to report, display or log the warning. Changing `error_reporting`, using `@`, or disabling `display_errors` or `log_errors` does not protect against this vulnerability.\r\n\r\n##### Reachability\r\n\r\nWith Apache mod_php, `.htaccess` and Apache `php_value`/`php_flag`/`php_admin_*` directory configuration is applied before `php_request_startup()`. Normal `php.ini` is startup configuration and is not reapplied as a consumer across requests.\r\n\r\nFPM is conditionally exposed when nginx, Apache `mod_proxy_fcgi` or another frontend sends `PHP_VALUE`/`PHP_ADMIN_VALUE` parameters that produce a diagnostic before request initialization. FPM pool values are applied when a worker starts, and `.user.ini` is applied after normal initialization. They do not provide the same early consumer. FPM also exits a child after `php_request_startup()` returns failure.\r\n\r\nLSAPI can apply special environment INI values early and is a conditional candidate. An equivalent early configuration consumer was not established in the default configuration of FrankenPHP. This does not make this environment immune. It may expose different consumers through application or extension behavior.\r\n\r\n#### Session upload progress before normal initialization\r\n\r\nSession upload progress can reach session handling before ordinary session initialization. It can therefore consume session or decoder state left by an interrupted request before normal initialization resets it. This consumer is independent of the INI diagnostic path and does not require a diagnostic from configuration.\r\n\r\n## Concrete and candidate cases\r\n\r\n### PHP 8.5 fatal error backtrace: confirmed\r\n\r\nWith `fatal_error_backtraces` enabled, fatal error reporting stores backtrace state owned by the request. Resetting of this global state is always missed during shutdown. A diagnostic on a subsequent request reaches the stale value before normal request initialization resets it.\r\n\r\nThis is the strongest demonstrated case and is the basis of the confirmed mod_php exploitation.\r\n\r\n### Session upload progress lifecycle: confirmed\r\n\r\nAn upload can initialize request-owned session and decoding state before normal module initialization. OOM or another fatal error after that state has been published can prevent its matching reset. PHP then frees the request heap while persistent session or decoder globals still refer to it. A later upload progress operation reaches those globals before ordinary initialization and treats them as valid state.\r\n\r\nThe demonstrated application-independent trigger is OOM during input processing. Other fatal errors at this stage can cause the same state transition, but generally require additional application, extension or configuration conditions.\r\n\r\nWith mod_php, both the producing operation and fatal error can occur during multipart startup. FPM terminates a child when this startup fails, so that exact sequence does not survive. The validated FPM path instead publishes state during application execution after successful startup, reaches a fatal error, and then uses session upload progress as the early consumer. It works with a normal dynamic FPM pool, although it depends on a suitable application operation.\r\n\r\nSession upload progress is enabled by default, and no application call to `session_start()` is required. It can supply a producer, consumer or both, but exploitation still requires an interruption after state is published and a subsequent request handled by the same worker.\r\n\r\n### Other error, exception, object and extension state: conditional\r\n\r\nSupported PHP branches contain other request state that may become unsafe after a request boundary. The complete patch resets this wider state because it must not survive into operations that precede normal initialization. Whether it is reachable depends on the application, extensions and the exact point where the state was published.\r\n\r\nFatal errors inside PHP operations that call back into an application deserve particular attention. The callback may introduce a fatal error while the operation still has temporary state. Applicability depends on a route reachable by an attacker, the callbacks registered by that application or extension, and a later consumer before normal request initialization. There is no configuration based mitigation that covers every such operation.\r\n\r\n## Mitigation\r\n\r\n> [!WARNING]\r\n> Updating to a release containing the complete state reset patch is the only reliable mitigation. **There is no complete generic configuration mitigation as an application, extension or server path may publish stale state or consume it without a predictable log entry.**\r\n\r\nFor PHP 8.5 installations that cannot update, set `fatal_error_backtraces=0` administratively and restart every worker. This removes the producer used by the confirmed RCE case. It does not cover other request-owned global or extension state.\r\n\r\nFor the session lifecycle case, set `session.upload_progress.enabled=0` administratively and restart every worker. This prevents the demonstrated early session producing and consuming operations. It does not mitigate the other lifecycle paths. It might be prudent to set `session.upload_progress.enabled=0` if you don't need this feature even after applying the patch, as more attackers try to find flaws in this hardly-used and hardly-tested feature.\r\n\r\nReduce the remaining risk by breaking as many links in the lifecycle as possible:\r\n\r\n1. Eliminate fatal errors on paths reachable by an attacker. Include failures that depend on request flow in upload, import, error page, shutdown, destructor, serialization, output handler, plugin and extension paths rather than only failures seen during ordinary page requests.\r\n2. Eliminate warnings and other diagnostics emitted during extension post-deactivation and server cleanup, after normal request error state has already been cleared.\r\n3. Eliminate diagnostics from all INI configuration applied before request initialization. Prefer `php.ini`, FPM pool or server configuration applied at startup over per request overrides, and remove obsolete directives.\r\n4. If performance is not a factor, consider limiting the number of requests a worker may execute using `pm.max_requests=1`.\r\n\r\nA PHP execution timeout should be treated like another fatal error. Prevent attacker controlled requests from predictably reaching `Maximum execution time exceeded` while PHP is inside an affected operation. Changing the time limit only removes that possible interruption and does not mitigate the other cases.\r\n\r\n### Logging and configuration audit\r\n\r\nEnable `log_errors=On`, a functional `error_log`, and `error_reporting=E_ALL` in startup configuration during an isolated audit. Review Apache, PHP-FPM, reverse proxy and service logs for:\r\n\r\n- Warnings, deprecations and core errors repeated before target scripts run.\r\n- Warnings and other diagnostics produced during extension or server cleanup.\r\n- Fatal, parse and uncaught error messages.\r\n- `Maximum execution time exceeded`.\r\n- Failures restricted to routes, content types, files, callback implementations or plugin options controlled by an attacker.\r\n\r\nFixing observed errors reduces exposure, but absence of an error in logs is not proof of safety. Historical logs may have been collected with deprecations or other relevant severities excluded. Even an audit using `E_ALL` only covers the routes and application states that were exercised. A failure may also happen before PHP writes the message. Logs must supplement a static configuration and application flow audit.\r\n\r\n**Important**: Make sure to also follow the remediation advice from the related report.\r\nhttps://github.com/php/php-src/security/advisories/GHSA-w8hw-w9fx-j79w\r\n\r\n## Impact and reliability\r\n\r\nThe confirmed impact is unauthenticated heap use-after-free, memory disclosure and remote code execution with the web worker's privileges. The fatal backtrace path has confirmed RCE against mod_php. Session lifecycle RCE was validated against mod_php and FPM. Other state families establish security impact only after a concrete producer and consumer are shown.\r\n\r\nThe producer and consumer requests must reach the same worker. Multiple workers and recycling reduce success per request but do not remove the condition.\r\n",
+  "severity": "critical",
+  "identifiers": [
+   {
+    "value": "GHSA-6wmf-4rv5-p3rp",
+    "type": "GHSA"
+   },
+   {
+    "value": "CVE-2026-109619",
+    "type": "CVE"
+   }
+  ],
+  "state": "published",
+  "created_at": null,
+  "updated_at": "2026-10-21T13:34:13Z",
+  "published_at": "2026-10-21T13:34:13Z",
+  "closed_at": null,
+  "withdrawn_at": null,
+  "submission": null,
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "php-src"
+    },
+    "vulnerable_version_range": "< 8.2.35",
+    "patched_versions": "8.2.35",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "php-src"
+    },
+    "vulnerable_version_range": "< 8.3.36",
+    "patched_versions": "8.3.36",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "php-src"
+    },
+    "vulnerable_version_range": "< 8.4.27",
+    "patched_versions": "8.4.27",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "php-src"
+    },
+    "vulnerable_version_range": "< 8.5.12",
+    "patched_versions": "8.5.12",
+    "vulnerable_functions": []
+   }
+  ],
+  "cvss_severities": {
+   "cvss_v3": {
+    "vector_string": null,
+    "score": null
+   },
+   "cvss_v4": {
+    "vector_string": "CVSS:4.0/AV:N/AC:H/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N",
+    "score": 9.2
+   }
+  },
+  "cwes": [
+   {
+    "cwe_id": "CWE-416",
+    "name": "Use After Free"
+   },
+   {
+    "cwe_id": "CWE-755",
+    "name": "Improper Handling of Exceptional Conditions"
+   },
+   {
+    "cwe_id": "CWE-824",
+    "name": "Access of Uninitialized Pointer"
+   },
+   {
+    "cwe_id": "CWE-1325",
+    "name": "Improperly Controlled Sequential Memory Allocation"
+   },
+   {
+    "cwe_id": "CWE-1419",
+    "name": "Incorrect Initialization of Resource"
+   }
+  ],
+  "cwe_ids": [
+   "CWE-416",
+   "CWE-755",
+   "CWE-824",
+   "CWE-1325",
+   "CWE-1419"
+  ],
+  "collaborating_teams": null,
+  "private_fork": null,
+  "comments": 7,
+  "cvss": {
+   "vector_string": null,
+   "score": null
+  }
+ },
+ {
+  "ghsa_id": "GHSA-62xp-839h-2637",
+  "cve_id": "CVE-2026-91768",
+  "url": "https://api.github.com/repos/php/php-src/security-advisories/GHSA-62xp-839h-2637",
+  "html_url": "https://github.com/php/php-src/security/advisories/GHSA-62xp-839h-2637",
+  "summary": "IPv6 ACL bypass in FastCGI listen.allowed_clients due to partial address comparison (memcmp 12 bytes)",
+  "description": "### Summary\r\n\r\nThe IPv6 branch of the FastCGI client access check compares only the first 12 bytes of a 16-byte IPv6 address, so `listen.allowed_clients` matches on a /96 prefix instead of the exact address. An attacker who can source an address sharing the first 96 bits with an allowed one passes the check and reaches the FastCGI endpoint.\r\n\r\n### Details\r\n\r\n`fcgi_is_allowed()` in `main/fastcgi.c` compares IPv6 client addresses with a hard-coded length of 12:\r\n\r\nhttps://github.com/php/php-src/blob/php-8.5.10/main/fastcgi.c#L1334\r\n\r\nAn exact IPv6 comparison must cover all 16 bytes of `struct in6_addr`. The IPv4 branch above it compares its full 4 bytes correctly, and the `IN6_IS_ADDR_V4MAPPED` branch legitimately uses a 12-byte offset to reach the embedded IPv4 address, but that offset is not a valid length for a plain IPv6 comparison. Allowed addresses are parsed as full addresses with `inet_pton(AF_INET6, ...)`, so the truncated comparison silently widens every configured entry to a /96 network.\r\n\r\nThe fix compares `sizeof(client_sa.sa_inet6.sin6_addr)` bytes.\r\n\r\n### PoC\r\n\r\nTested against a real `php-fpm` (fpm-fcgi), not a mock.\r\n\r\n1. Configure a pool:\r\n\r\n```ini\r\nlisten = [::1]:19091\r\nlisten.allowed_clients = ::2\r\n```\r\n\r\n2. Run php-fpm and send a FastCGI request from `::1` to `[::1]:19091` for a test script.\r\n\r\n3. The request is accepted and the script executes, even though `::1` is not in `listen.allowed_clients`. Both addresses share the first 96 bits.\r\n\r\n4. Control test: set `listen.allowed_clients = 2001:db8::2` and send the same request from `::1`. The connection is denied as expected, because the first 96 bits differ.\r\n\r\n### Impact\r\n\r\nThis is an access control bypass in deployments that use FastCGI over IPv6 TCP and rely on `listen.allowed_clients` as a security boundary. An attacker with network reachability who can source an address within the same /96 as an allowed client bypasses the ACL and reaches the FastCGI endpoint, which in many deployments means executing PHP scripts in the FPM worker context.\r\n\r\nDeployments using Unix sockets, IPv4 only, or an external firewall as the actual boundary are not affected.\r\n\r\n### Credit\r\n\r\nThis issue was originally reported in GHSA-r37j-mv37-rjpc. That advisory could not be used because the reporting account was deleted.\r\n",
+  "severity": "medium",
+  "identifiers": [
+   {
+    "value": "GHSA-62xp-839h-2637",
+    "type": "GHSA"
+   },
+   {
+    "value": "CVE-2026-91768",
+    "type": "CVE"
+   }
+  ],
+  "state": "published",
+  "created_at": null,
+  "updated_at": "2026-09-25T21:04:06Z",
+  "published_at": "2026-09-24T10:06:55Z",
+  "closed_at": null,
+  "withdrawn_at": null,
+  "submission": null,
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "PHP-FPM"
+    },
+    "vulnerable_version_range": "<8.2.34",
+    "patched_versions": "8.2.34",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "PHP-FPM"
+    },
+    "vulnerable_version_range": "<8.3.35",
+    "patched_versions": "8.3.35",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "PHP-FPM"
+    },
+    "vulnerable_version_range": "<8.4.26",
+    "patched_versions": "8.4.26",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "php",
+     "name": "PHP-FPM"
+    },
+    "vulnerable_version_range": "<8.5.11",
+    "patched_versions": "8.5.11",
+    "vulnerable_functions": []
+   }
+  ],
+  "cvss_severities": {
+   "cvss_v3": {
+    "vector_string": "CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+    "score": 6.5
+   },
+   "cvss_v4": {
+    "vector_string": null,
+    "score": null
+   }
+  },
+  "cwes": [],
+  "cwe_ids": [],
+  "collaborating_teams": null,
+  "private_fork": null,
+  "comments": 4,
+  "cvss": {
+   "vector_string": "CVSS:3.1/AV:A/AC:L/PR:N/UI:N/S:U/C:H/I:N/A:N",
+   "score": 6.5
+  }
+ },
+ {
+  "ghsa_id": "GHSA-ch8v-r6jh-4vvr",
+  "cve_id": null,
+  "url": "https://api.github.com/repos/php/php-src/security-advisories/GHSA-ch8v-r6jh-4vvr",
+  "html_url": "https://github.com/php/php-src/security/advisories/GHSA-ch8v-r6jh-4vvr",
+  "summary": "ext/filter: encode 0xFF in FILTER_SANITIZE_ENCODED",
+  "description": "### Summary\n\n`php_filter_encode_url()` builds a 256-entry lookup table that decides which bytes `FILTER_SANITIZE_ENCODED` percent-encodes, but initialises only the first 255 entries. Entry 255 is read uninitialised, so whether the byte `0xFF` is encoded or passed through depends on whatever happened to be on the stack.\n\n### Details\n\nThe table is filled with `memset(tmp, 1, sizeof(tmp) - 1)`, which leaves `tmp[255]` untouched:\n\nhttps://github.com/php/php-src/blob/php-8.5.9/ext/filter/sanitizing_filters.c#L73\n\nThe filter then consults `tmp[*s]` for every input byte, so for `0xFF` the decision comes from uninitialised stack memory. Every other byte is handled deterministically.\n\nThe fix changes the `memset()` length to `sizeof(tmp)` so the whole table is initialised.\n\n### PoC\n\n```php\n<?php\n$out = filter_var(\"\\xff\\xfeabc\", FILTER_SANITIZE_ENCODED);\necho \"in : \", bin2hex(\"\\xff\\xfeabc\"), \"\\n\";\necho \"out: \", bin2hex($out), \"\\n\";\n```\n\n```\nin : fffe616263\nout: ff254645616263\n```\n\n`0xFE` is percent-encoded as `%FE` while `0xFF` is passed through raw, showing that `tmp[255]` was read uninitialised.\n\n### Impact\n\nThe impact is low. There is no crash and no memory corruption; the only effect is that the `0xFF` byte is sanitised inconsistently, depending on uninitialised stack contents. A downstream consumer that relies on `FILTER_SANITIZE_ENCODED` producing fully percent-encoded output could in principle be affected as part of a longer chain, but the filter provides no such guarantee on its own.\n\nThis issue was fixed publicly in 8.4.25 and 8.5.10 before it was recognised as security relevant, and is backported here to the branches that receive security fixes only.\n",
+  "severity": "low",
+  "identifiers": [
+   {
+    "value": "GHSA-ch8v-r6jh-4vvr",
+    "type": "GHSA"
+   }
+  ],
+  "state": "published",
+  "created_at": null,
+  "updated_at": "2026-09-24T10:07:15Z",
+  "published_at": "2026-09-24T10:07:15Z",
+  "closed_at": null,
+  "withdrawn_at": null,
+  "submission": null,
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "ext-filter"
+    },
+    "vulnerable_version_range": "<8.2.34",
+    "patched_versions": "8.2.34",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "ext-filter"
+    },
+    "vulnerable_version_range": "<8.3.35",
+    "patched_versions": "8.3.35",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "ext-filter"
+    },
+    "vulnerable_version_range": "<8.4.25",
+    "patched_versions": "8.4.25",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "ext-filter"
+    },
+    "vulnerable_version_range": "<8.5.10",
+    "patched_versions": "8.5.10",
+    "vulnerable_functions": []
+   }
+  ],
+  "cvss_severities": {
+   "cvss_v3": {
+    "vector_string": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+    "score": 3.7
+   },
+   "cvss_v4": {
+    "vector_string": null,
+    "score": null
+   }
+  },
+  "cwes": [],
+  "cwe_ids": [],
+  "collaborating_teams": null,
+  "private_fork": null,
+  "comments": 5,
+  "cvss": {
+   "vector_string": "CVSS:3.1/AV:N/AC:H/PR:N/UI:N/S:U/C:L/I:N/A:N",
+   "score": 3.7
+  }
+ }
+]

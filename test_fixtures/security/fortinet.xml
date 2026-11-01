@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rss xmlns:csaf="https://fortiguard.fortinet.com/rss/ns/csaf" xmlns:cvrf="https://fortiguard.fortinet.com/rss/ns/cvrf" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0"><channel><title>FortiGuard Labs | FortiGuard Center - IR Advisories</title><link>https://fortiguard.fortinet.com/rss/ir.xml</link><description>The following is a list of advisories for issues resolved in Fortinet products. The resolution of such issues is coordinated by the Fortinet Product Security Incident Response Team (PSIRT), a dedicated, global team that manages the receipt, investigation, and public reporting of information about security vulnerabilities and issues related to Fortinet products and services.</description><docs>http://www.rssboard.org/rss-specification</docs><generator>python-feedgen</generator><lastBuildDate>Wed, 21 Oct 2026 23:30:07 +0000</lastBuildDate><pubDate>Wed, 21 Oct 2026 23:30:07 -0700</pubDate><item><title>PHP core RCE vulnerability patches (CVE-2026-109618 and CVE-2026-109619)</title><link>https://fortiguard.fortinet.com/psirt/FG-IR-26-186</link><description><![CDATA[<p>
+ <strong>
+  CVSSv3 Score:
+ </strong>
+ 9.8
+</p>
+<p>
+ CVE-2026-109618PHP uses longjmp() for out-of-memory (OOM) errors to exit the current context and abort handling of the request. Some contexts may not properly account for this scenario and leave request memory in an uninitialized state before performing an allocation. The subsequent request cleanup procedure may read or branch on this memory. Multiple OOM strategies can consistently trigger this condition and lead to remote code execution (RCE).
+</p>
+<p>
+ <em>
+  Revised on 2026-10-21 00:00:00
+ </em>
+</p>
+]]></description><guid isPermaLink="true">https://fortiguard.fortinet.com/psirt/FG-IR-26-186</guid><pubDate>Wed, 21 Oct 2026 00:00:00 -0700</pubDate><csaf:link>https://filestore.fortinet.com/fortiguard/psirt/csaf_php-core-rce-vulnerability-patches-cve-2026-109618-and-cve-2026-109619_fg-ir-26-186.json</csaf:link><cvrf:link>https://fortiguard.fortinet.com/psirt/cvrf/FG-IR-26-186</cvrf:link></item><item><title>Arbitrary file write in grpc phQueryMaster</title><link>https://fortiguard.fortinet.com/psirt/FG-IR-26-180</link><description><![CDATA[<p>
+ <strong>
+  CVSSv3 Score:
+ </strong>
+ 9.4
+</p>
+<p>
+ An Improper limitation of a pathname to a restricted directory ('path traversal') [CWE-22] in FortiSIEM may allow an unauthenticated attacker to execute unauthorized code or commands via specially crafted packets.
+</p>
+<p>
+ <em>
+  Revised on 2026-10-13 00:00:00
+ </em>
+</p>
+]]></description><guid isPermaLink="true">https://fortiguard.fortinet.com/psirt/FG-IR-26-180</guid><pubDate>Tue, 13 Oct 2026 00:00:00 -0700</pubDate><csaf:link>https://filestore.fortinet.com/fortiguard/psirt/csaf_arbitrary-file-write-in-grpc-phquerymaster_fg-ir-26-180.json</csaf:link><cvrf:link>https://fortiguard.fortinet.com/psirt/cvrf/FG-IR-26-180</cvrf:link></item><item><title>Broken authorization</title><link>https://fortiguard.fortinet.com/psirt/FG-IR-26-183</link><description><![CDATA[<p>
+ <strong>
+  CVSSv3 Score:
+ </strong>
+ 3.4
+</p>
+<p>
+ A missing authorization vulnerability [CWE-862] in FortiSIEM GUI may allow an authenticated attacker to execute unauthorized code or commands  via Specially crafted HTTP requests
+</p>
+<p>
+ <em>
+  Revised on 2026-10-13 00:00:00
+ </em>
+</p>
+]]></description><guid isPermaLink="true">https://fortiguard.fortinet.com/psirt/FG-IR-26-183</guid><pubDate>Tue, 13 Oct 2026 00:00:00 -0700</pubDate><csaf:link>https://filestore.fortinet.com/fortiguard/psirt/csaf_broken-authorization_fg-ir-26-183.json</csaf:link><cvrf:link>https://fortiguard.fortinet.com/psirt/cvrf/FG-IR-26-183</cvrf:link></item></channel></rss>

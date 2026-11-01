@@ -1,0 +1,10 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["release", ".venv", ".graphify-packages"]
+force-exclude = true
+fix = false
+
+[tool.ruff.lint]
+# Le contrôle standard ne bloque que les erreurs ; la CI lance le style séparément.
+select = ["E9", "F"]

@@ -1,0 +1,50 @@
+/* OpsControl — apparence « premium » (salle de contrôle sobre), chargée en dernier.
+   Activation par poste : préférence locale « look » (bouton Premium / Classique de la barre
+   du haut), lue par boot.js avant le premier rendu. Sans elle, aucune règle ne s'applique :
+   la V2 reste l'apparence de production et le retour arrière est immédiat.
+   Attribut distinct de data-ui : toutes les règles V2 ciblent [data-ui=v2], qui doit rester posé.
+   Principe : bleu-gris neutre par défaut, la couleur est réservée au dépassement de seuil. */
+
+/* Composant de jauge unique. La largeur passe par les classes quantifiées .v2-w0…100
+   (v2.css) : la CSP style-src 'self' interdit style="--v:…" et laisserait la barre vide. */
+.oc-gauge{height:6px;border-radius:999px;background:var(--line);overflow:hidden}
+.oc-gauge>i{display:block;height:100%;border-radius:inherit;background:var(--accent)}
+.oc-gauge[data-level=warn]>i{background:var(--orange)}
+.oc-gauge[data-level=crit]>i{background:var(--red)}
+.oc-gauge[data-level=none]>i{background:var(--grey)}
+@media (prefers-reduced-motion:no-preference){.oc-gauge>i{transition:width .4s ease}}
+
+/* Jetons : rayons, ombre unique, polices. Inter et JetBrains Mono ne sont utilisées que si
+   elles sont installées sur le poste (la CSP n'autorise aucune police externe) ; à défaut,
+   Segoe UI Variable et Cascadia Mono, livrées avec Windows 11. */
+:root[data-look=premium]{--radius:12px;--radius-card:12px;--radius-ctl:8px;--radius-pill:999px;
+  --font-ui:Inter,"Segoe UI Variable","Segoe UI",system-ui,sans-serif;
+  --font-mono:"JetBrains Mono","Cascadia Mono",Consolas,monospace;
+  --g-ok:#7d8ba1;--shadow:0 1px 2px rgb(0 0 0/.28),0 4px 12px rgb(0 0 0/.16)}
+:root[data-look=premium][data-theme=light]{--g-ok:#64748b;--shadow:0 1px 2px rgb(15 23 42/.06),0 4px 12px rgb(15 23 42/.04)}
+
+:root[data-look=premium] body{font-family:var(--font-ui);font-variant-numeric:tabular-nums}
+:root[data-look=premium] td.ip,:root[data-look=premium] code,:root[data-look=premium] .mono{font-family:var(--font-mono)}
+
+/* Formes : 12 px pour les cartes, 8 px pour les contrôles, pastilles arrondies. */
+:root[data-look=premium] :is(.panel,.card,.stat-card,.pve-gauge,.pve-traffic,.pve-hero,.v2-gauge,.control){border-radius:var(--radius-card);box-shadow:var(--shadow)}
+:root[data-look=premium] :is(button,input,select,textarea,.table){border-radius:var(--radius-ctl)}
+:root[data-look=premium] .badge{border-radius:var(--radius-pill);padding:3px 9px}
+
+/* Jauges existantes : même gabarit (6 px) et même logique de couleur. Les teintes par type
+   de mesure (violet mémoire, cyan stockage, vert par défaut) disparaissent : sous le seuil,
+   la barre reste neutre, l'œil ne s'arrête que sur l'orange et le rouge. */
+:root[data-look=premium] :is(.oc-gauge,.pve-gauge-track,.v2-track,.meter,.n-meter){height:6px;border-radius:999px}
+:root[data-look=premium] :is(.oc-gauge[data-level=ok]>i,.pve-gauge .pve-gauge-track i,.v2-gauge .v2-track i,.meter i,.n-fill){background:var(--g-ok)}
+:root[data-look=premium] :is(.pve-gauge.warning .pve-gauge-track i,.v2-gauge.sev-warning .v2-track i,.meter.warning i,.n-meter.warning .n-fill){background:var(--orange)}
+:root[data-look=premium] :is(.pve-gauge.critical .pve-gauge-track i,.v2-gauge.sev-critical .v2-track i,.meter.critical i,.n-meter.critical .n-fill){background:var(--red)}
+:root[data-look=premium] :is(.v2-gauge.is-stale .v2-track i,.n-meter.stale .n-fill){background:var(--grey)}
+/* « 57,6 % » ne doit jamais se couper sur deux lignes. */
+:root[data-look=premium] :is(.pve-gauge-head strong,.v2-gauge-head strong,.n-metric-value){white-space:nowrap;font-family:var(--font-mono);font-weight:600;letter-spacing:-.2px}
+
+/* Rouge rationné dans les tableaux : une pastille colorée et un texte neutre. Le badge plein
+   reste réservé aux en-têtes, cartes et bandeaux, où il signale vraiment l'urgence. */
+:root[data-look=premium] td .badge:is(.critical,.unreachable,.fail,.failed,.warning,.ok,.pass,.active){background:transparent;color:var(--text);padding-left:0}
+:root[data-look=premium] td .badge:is(.critical,.unreachable,.fail,.failed,.warning,.ok,.pass,.active)::before{content:"";width:8px;height:8px;border-radius:50%;flex:none;background:var(--green)}
+:root[data-look=premium] td .badge:is(.critical,.unreachable,.fail,.failed)::before{background:var(--red)}
+:root[data-look=premium] td .badge.warning::before{background:var(--orange)}

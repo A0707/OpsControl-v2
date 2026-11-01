@@ -1,0 +1,16 @@
+{
+  "name": "OpsControl — Centre d’exploitation",
+  "short_name": "OpsControl",
+  "description": "Supervision IT en lecture seule : incidents critiques, sources et serveurs.",
+  "lang": "fr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#101318",
+  "theme_color": "#101318",
+  "icons": [
+    {"src": "/assets/opscontrol-icon-64.png", "sizes": "64x64", "type": "image/png"},
+    {"src": "/assets/opscontrol-icon-96.png", "sizes": "96x96", "type": "image/png"},
+    {"src": "/assets/opscontrol-icon.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any"}
+  ]
+}

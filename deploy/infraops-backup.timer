@@ -1,0 +1,11 @@
+[Unit]
+Description=InfraOps - sauvegarde quotidienne de la base et de la configuration
+
+[Timer]
+OnCalendar=*-*-* 02:30:00
+RandomizedDelaySec=10m
+# Une sauvegarde manquée (VM arrêtée à l'heure prévue) est rattrapée au démarrage.
+Persistent=true
+
+[Install]
+WantedBy=timers.target

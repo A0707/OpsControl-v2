@@ -1,0 +1,5 @@
+.ai-panel label { display: block; margin: 1rem 0 .4rem; }
+.ai-panel textarea { display: block; width: 100%; max-width: 70rem; }
+.ai-panel pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 32rem; overflow: auto; padding: 1rem; }
+.ai-panel article { margin: 1rem 0; padding: 1rem; border: 1px solid currentColor; border-radius: .5rem; }
+.ai-panel button { margin: .3rem; }

@@ -1,0 +1,116 @@
+{
+ "$ref": "https://www.cert.ssi.gouv.fr/openapi.json",
+ "affected_systems": [
+  {
+   "description": "Windows Server 2016 (Server Core installation) versions antérieures à 10.0.14393.9612",
+   "product": {
+    "name": "N/A",
+    "vendor": {
+     "name": "Microsoft",
+     "scada": false
+    }
+   }
+  },
+  {
+   "description": "Windows Server 2025 (Server Core installation)",
+   "product": {
+    "name": "N/A",
+    "vendor": {
+     "name": "Microsoft",
+     "scada": false
+    }
+   }
+  },
+  {
+   "description": "Windows 10 Version 1809 pour systèmes 32 bits versions antérieures à 10.0.17763.9245",
+   "product": {
+    "name": "N/A",
+    "vendor": {
+     "name": "Microsoft",
+     "scada": false
+    }
+   }
+  }
+ ],
+ "affected_systems_content": null,
+ "content": "## Solutions\n\nSe référer au bulletin de sécurité de l'éditeur pour l'obtention des correctifs (cf. section Documentation).",
+ "cves": [
+  {
+   "name": "CVE-2026-70096",
+   "url": "https://www.cve.org/CVERecord?id=CVE-2026-70096"
+  },
+  {
+   "name": "CVE-2026-100200",
+   "url": "https://www.cve.org/CVERecord?id=CVE-2026-100200"
+  },
+  {
+   "name": "CVE-2026-100201",
+   "url": "https://www.cve.org/CVERecord?id=CVE-2026-100201"
+  },
+  {
+   "name": "CVE-2026-100202",
+   "url": "https://www.cve.org/CVERecord?id=CVE-2026-100202"
+  },
+  {
+   "name": "CVE-2026-100203",
+   "url": "https://www.cve.org/CVERecord?id=CVE-2026-100203"
+  }
+ ],
+ "links": [],
+ "reference": "CERTFR-2026-AVI-1314",
+ "revisions": [
+  {
+   "description": "Version initiale",
+   "revision_date": "2026-10-14T00:00:00.000000"
+  }
+ ],
+ "risks": [
+  {
+   "description": "Déni de service à distance"
+  },
+  {
+   "description": "Exécution de code arbitraire à distance"
+  },
+  {
+   "description": "Atteinte à l'intégrité des données"
+  },
+  {
+   "description": "Contournement de la politique de sécurité"
+  },
+  {
+   "description": "Atteinte à la confidentialité des données"
+  },
+  {
+   "description": "Élévation de privilèges"
+  }
+ ],
+ "summary": "De multiples vulnérabilités ont été découvertes dans Microsoft Windows. Certaines d'entre elles permettent à un attaquant de provoquer une exécution de code arbitraire à distance, une élévation de privilèges et un déni de service à distance.\n\nMicrosoft indique que la vulnérabilité CVE-2026-96951 est activement exploitée.",
+ "title": "Multiples vulnérabilités dans Microsoft Windows",
+ "vendor_advisories": [
+  {
+   "published_at": "2026-10-13",
+   "title": "Bulletin de sécurité Microsoft Windows CVE-2026-83580",
+   "url": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-83580"
+  },
+  {
+   "published_at": "2026-10-13",
+   "title": "Bulletin de sécurité Microsoft Windows CVE-2026-102191",
+   "url": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-102191"
+  },
+  {
+   "published_at": "2026-10-13",
+   "title": "Bulletin de sécurité Microsoft Windows CVE-2026-83648",
+   "url": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-83648"
+  },
+  {
+   "published_at": "2026-10-13",
+   "title": "Bulletin de sécurité Microsoft Windows CVE-2026-85820",
+   "url": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-85820"
+  },
+  {
+   "published_at": "2026-10-13",
+   "title": "Bulletin de sécurité Microsoft Windows CVE-2026-83877",
+   "url": "https://msrc.microsoft.com/update-guide/vulnerability/CVE-2026-83877"
+  }
+ ]
+}

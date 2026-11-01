@@ -1,0 +1,4 @@
+192.0.2.66 - - [27/Oct/2026:01:00:00 +0100] "GET / HTTP/1.1" 200 1024 "-" "curl/8.5.0"
+old.example.test:443 198.51.100.9 - - [27/Oct/2026:04:00:00 +0100] "GET /status HTTP/1.1" 502 341 "-" "Mozilla/5.0"
+127.0.0.1 - - [27/Oct/2026:07:00:00 +0100] "GET /server-status?auto HTTP/1.1" 200 812 "-" "curl/8.5.0"
+ligne tronquée par la rotation sans format combined

@@ -1,0 +1,5 @@
+# Outils d'exploitation lancés à la main, hors du service (classeurs Excel) :
+# inventaire_applications.py, export_proxmox_stockage.py, export_serveurs.py,
+# export_enregistrements_waf.py, export_inventaire_vm.py, export_vulnerabilites.py.
+# Installer dans le .venv du projet : python -m pip install -r requirements-tools.txt
+openpyxl==3.1.5

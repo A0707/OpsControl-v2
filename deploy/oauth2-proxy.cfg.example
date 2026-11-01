@@ -1,0 +1,43 @@
+# oauth2-proxy devant OpsControl — EXEMPLE à adapter (fournisseur d'identité non encore choisi).
+# Copier en /etc/oauth2-proxy/infraops.cfg (0640 root:oauth2-proxy) ; le service écoute
+# en local sur 127.0.0.1:4180, appelé par nginx (deploy/nginx-infraops.conf, auth_request).
+#
+# La MFA est portée par le fournisseur d'identité (accès conditionnel, politique du
+# client OIDC) : oauth2-proxy ne fait que vérifier la session qu'il délivre.
+# OpsControl reçoit l'adresse e-mail (X-Auth-Request-Email -> X-OpsControl-User) et lui
+# attribue un rôle via INFRAOPS_ADMINS / INFRAOPS_OPERATORS (sinon viewer).
+
+http_address = "127.0.0.1:4180"
+reverse_proxy = true
+# nginx lit l'identité dans la réponse de /oauth2/auth.
+set_xauthrequest = true
+
+# ---- Fournisseur : OIDC générique (choisir UNE des variantes ci-dessous) -------------
+provider = "oidc"
+# Microsoft Entra ID :  https://login.microsoftonline.com/<TENANT_ID>/v2.0
+# Keycloak :            https://<keycloak>/realms/<realm>
+oidc_issuer_url = "https://IDP.EXEMPLE/realms/example"
+client_id = "opscontrol"
+# Secret du client OIDC : NE PAS l'écrire ici. Le fournir par l'environnement du service :
+#   OAUTH2_PROXY_CLIENT_SECRET=...  (fichier d'environnement 0640, comme secrets.env)
+# client_secret = ""
+redirect_url = "https://infraops.example.test/oauth2/callback"
+scope = "openid email profile"
+# Entra ID : ajouter « oidc_email_claim = "preferred_username" » si l'e-mail n'est pas émis.
+
+# ---- Qui peut entrer ------------------------------------------------------------------
+# Domaine de messagerie de l'entreprise ; restreindre encore par groupe si le fournisseur
+# le permet (allowed_groups), de préférence à une liste d'adresses ici.
+email_domains = ["example.test"]
+# allowed_groups = ["<id ou nom du groupe NOC>"]
+
+# ---- Session ---------------------------------------------------------------------------
+# Secret de cookie : 32 octets aléatoires, fourni par l'environnement (OAUTH2_PROXY_COOKIE_SECRET),
+# généré par :  python3 -c 'import secrets,base64; print(base64.urlsafe_b64encode(secrets.token_bytes(32)).decode())'
+cookie_name = "_opscontrol"
+cookie_secure = true
+cookie_httponly = true
+cookie_samesite = "lax"
+cookie_expire = "8h"
+cookie_refresh = "1h"
+skip_provider_button = true

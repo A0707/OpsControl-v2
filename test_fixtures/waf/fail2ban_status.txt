@@ -1,0 +1,9 @@
+Status for the jail: apache-modsecurity
+|- Filter
+|  |- Currently failed:	3
+|  |- Total failed:	1287
+|  `- File list:	/var/log/apache2/error.log
+`- Actions
+   |- Currently banned:	5
+   |- Total banned:	412
+   `- Banned IP list:	198.51.100.4 198.51.100.9 2001:db8::7 192.0.2.66 198.51.100.23

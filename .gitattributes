@@ -1,0 +1,14 @@
+# Fichiers exécutés ou lus sur la VM Linux : fins de ligne LF quel que soit core.autocrlf
+# (un install-vm.sh en CRLF échoue sous bash).
+*.sh text eol=lf
+*.service text eol=lf
+*.timer text eol=lf
+*.conf text eol=lf
+deploy/*.py text eol=lf
+deploy/*.yaml text eol=lf
+deploy/*.js text eol=lf
+*.png binary
+*.mp4 binary
+*.webm binary
+# Fichiers installés sur les serveurs supervisés (script, sudoers) : LF obligatoire.
+deploy/remote/* text eol=lf

@@ -1,0 +1,94 @@
+name: CI OpsControl
+
+on:
+  # Branches principales au push ; les autres branches sont validées par leur pull request,
+  # sans double exécution (audit CI-07).
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      INFRAOPS_RUFF_BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Installer Python 3.11
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Installer les outils système locaux
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends sudo openssh-client
+
+      - name: Installer les dépendances Python
+        run: python -m pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Installer Playwright pour les tests navigateur (données simulées)
+        # Version figée, identique au poste d'exploitation ; Node.js est fourni par l'image.
+        run: |
+          npm install --prefix data/browser-test --no-save --no-audit --no-fund playwright@1.63.0 axe-core@4.10.2
+          npx --prefix data/browser-test playwright install --with-deps chromium
+
+      - name: Tests et audits, y compris pip-audit et tests navigateur
+        run: python deploy/ci.py --ui
+
+      - name: Vérifier la syntaxe Bash
+        shell: bash
+        run: |
+          for script in deploy/*.sh; do
+            bash -n "$script"
+          done
+
+      - name: Vérifier le fichier sudoers
+        run: sudo visudo -cf deploy/remote/sudoers-infraops
+
+      - name: Charger le modèle Zabbix en YAML
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          model = yaml.safe_load(Path('deploy/zabbix-template-opscontrol.yaml').read_text(encoding='utf-8'))
+          assert isinstance(model, dict) and 'zabbix_export' in model
+          PY
+
+      - name: Produire l’archive de code sans données d’exploitation
+        run: python deploy/package_vm.py --code-only
+
+      - name: Produire le SBOM CycloneDX des dépendances applicatives
+        run: |
+          python -m pip_audit -r requirements.txt --format cyclonedx-json --output dist/opscontrol-sbom.cdx.json --progress-spinner off
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          assert json.loads(Path('dist/opscontrol-sbom.cdx.json').read_text())['bomFormat'] == 'CycloneDX'
+          PY
+          cd dist
+          sha256sum *.tar.gz opscontrol-sbom.cdx.json > SHA256SUMS
+
+      - name: Publier l’archive et son SBOM comme artefact
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
+        with:
+          name: opscontrol-python311-${{ github.sha }}
+          path: |
+            dist/*.tar.gz
+            dist/opscontrol-sbom.cdx.json
+            dist/SHA256SUMS
+          if-no-files-found: error
+          retention-days: 30

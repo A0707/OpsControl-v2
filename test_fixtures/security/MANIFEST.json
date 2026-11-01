@@ -1,0 +1,23 @@
+{
+ "recorded_at": "2026-10-21T23:47:36Z",
+ "sources": {
+  "nvd_CVE-2026-109618.json": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-109618",
+  "nvd_CVE-2026-109619.json": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2026-109619",
+  "nvd_CVE-2019-11043.json": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2019-11043",
+  "nvd_CVE-2024-4577.json": "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-4577",
+  "epss_known.json": "https://api.first.org/data/v1/epss?cve=CVE-2019-11043,CVE-2024-4577",
+  "epss_new.json": "https://api.first.org/data/v1/epss?cve=CVE-2026-109618,CVE-2026-109619",
+  "kev.json": "https://www.cisa.gov/sites/default/files/feeds/known_exploited_vulnerabilities.json (5 entrées conservées)",
+  "ghsa_php.json": "https://api.github.com/repos/php/php-src/security-advisories?per_page=5 (identités des contributeurs retirées)",
+  "ghsa_wordpress.json": "https://api.github.com/repos/WordPress/wordpress-develop/security-advisories?per_page=3 (identités des contributeurs retirées)",
+  "wordpress.xml": "https://wordpress.org/news/category/security/feed/ (3 premiers éléments)",
+  "fortinet.xml": "https://filestore.fortinet.com/fortiguard/rss/ir.xml (3 premiers éléments)",
+  "proxmox.xml": "https://forum.proxmox.com/forums/announcements.7/index.rss (2 premiers éléments)",
+  "certfr_avis.xml": "https://cert.cyber.gouv.fr/avis/feed/ (3 premiers éléments)",
+  "php.xml": "https://www.php.net/releases/feed.php (4 premiers éléments)",
+  "certfr_CERTFR-2026-AVI-1314.json": "https://cert.cyber.gouv.fr/avis/CERTFR-2026-AVI-1314/json/ (listes réduites)",
+  "debian_dsa.txt": "https://salsa.debian.org/security-tracker-team/security-tracker/-/raw/master/data/DSA/list (avis PHP)",
+  "nvd_php_window.json": "https://services.nvd.nist.gov/rest/json/cves/2.0?virtualMatchString=cpe:2.3:a:php:php&lastModStartDate=2026-10-20T00:00:00.000Z&lastModEndDate=2026-10-22T00:00:00.000Z&resultsPerPage=500&startIndex=0"
+ },
+ "note": "Réponses réelles des API officielles, enregistrées pour les tests. Seuls des éléments ont été retirés (listes réduites, identités des contributeurs GitHub) ; aucune valeur n’a été modifiée."
+}

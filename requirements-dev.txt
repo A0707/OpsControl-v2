@@ -1,0 +1,5 @@
+# Outils de validation ; installer aussi requirements.txt.
+bandit==1.9.4
+detect-secrets==1.5.0
+pip-audit==2.10.1
+ruff==0.16.10

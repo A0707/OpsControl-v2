@@ -1,0 +1,29 @@
+# /etc/sudoers.d/infraops — droits du compte de supervision OpsControl (lecture seule).
+#
+# Installation (voir docs/SERVICE-ACCOUNT.md) :
+#   install -o root -g root -m 0440 sudoers-infraops /etc/sudoers.d/infraops
+#   visudo -cf /etc/sudoers.d/infraops        # OBLIGATOIRE : un fichier invalide casse sudo
+#
+# Règles :
+# - AUCUN motif « * » dans les arguments (il accepterait espaces et « .. ») : chaque
+#   commande est écrite en entier, ou passe par /usr/local/sbin/infraops-read qui
+#   vérifie lui-même le chemin réel ;
+# - chemins des binaires à confirmer sur le serveur (command -v apache2ctl ss iptables
+#   fail2ban-client) : sudo compare le chemin complet ;
+# - à n'installer que sur les serveurs WAF / Apache. Les autres serveurs n'ont besoin
+#   d'aucun sudo : l'audit SSH standard n'en utilise pas.
+
+Defaults:infraops !requiretty, env_reset
+
+Cmnd_Alias INFRAOPS_READ    = /usr/local/sbin/infraops-read
+Cmnd_Alias INFRAOPS_APACHE  = /usr/sbin/apache2ctl -M, /usr/sbin/apache2ctl -S
+Cmnd_Alias INFRAOPS_F2B     = /usr/bin/fail2ban-client status apache-modsecurity, \
+                              /usr/bin/fail2ban-client get apache-modsecurity ignoreip, \
+                              /usr/bin/fail2ban-client get apache-modsecurity maxretry, \
+                              /usr/bin/fail2ban-client get apache-modsecurity findtime, \
+                              /usr/bin/fail2ban-client get apache-modsecurity bantime, \
+                              /usr/bin/fail2ban-client get apache-modsecurity banip --with-time
+Cmnd_Alias INFRAOPS_NET     = /usr/bin/ss -Htanp state close-wait, \
+                              /usr/sbin/iptables -L INPUT -nvx
+
+infraops ALL=(root) NOPASSWD: INFRAOPS_READ, INFRAOPS_APACHE, INFRAOPS_F2B, INFRAOPS_NET

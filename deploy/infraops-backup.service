@@ -1,0 +1,29 @@
+[Unit]
+Description=InfraOps - sauvegarde locale de la base et de la configuration (sans secret)
+# Déclenchée par infraops-backup.timer ; aussi lançable à la main :
+#   sudo systemctl start infraops-backup.service && journalctl -u infraops-backup -n 20
+# Archives et état (last-backup.json, surveillé par Zabbix) : /opt/infraops/backups.
+# La copie HORS de la VM reste à brancher sur ce dossier (voir deploy/backup_state.py).
+
+[Service]
+Type=oneshot
+User=infraops
+Group=infraops
+ExecStart=/opt/infraops/current/.venv/bin/python /opt/infraops/current/deploy/backup_state.py --base /opt/infraops --db /opt/infraops/data/state.sqlite3 --dest /opt/infraops/backups
+# Test de restauration de l'archive qui vient d'être produite (empreinte, extraction en
+# dossier temporaire, integrity_check), sans aucun effet : une archive illisible fait
+# échouer l'unité (failed) ; --record écrit restore_test_ok dans last-backup.json, sur
+# lequel Zabbix alerte (audit OC-AUD-014).
+ExecStartPost=/opt/infraops/current/.venv/bin/python /opt/infraops/current/deploy/restore_state.py verify --latest /opt/infraops/backups --record
+Nice=10
+# Archives 0640 : elles contiennent la base. last-backup.json est rendu lisible à part.
+UMask=0027
+IOSchedulingClass=idle
+# Même durcissement que le service principal. data/ en écriture : la lecture d'une
+# base en mode WAL peut devoir créer son fichier -shm.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/infraops/backups /opt/infraops/data
+PrivateTmp=yes
+CapabilityBoundingSet=

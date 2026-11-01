@@ -1,0 +1,763 @@
+[
+ {
+  "ghsa_id": "GHSA-32m5-wc28-ghrr",
+  "cve_id": null,
+  "url": "https://api.github.com/repos/WordPress/wordpress-develop/security-advisories/GHSA-32m5-wc28-ghrr",
+  "html_url": "https://github.com/WordPress/wordpress-develop/security/advisories/GHSA-32m5-wc28-ghrr",
+  "summary": "Comments, including notes, can be reparented by any authenticated user",
+  "description": "An authenticated user (Author role suffices) who created a comment on their own post can send a request that reparents it onto a post they cannot edit.\r\n\r\nWordPress 7.1.1 has been released containing a fix for the vulnerability, and as a courtesy to users on older branches the fix has been backported to all branches back to 5.3.\r\n\r\nDiscovered and responsibly disclosed by Justin Hart, Viridis Security.",
+  "severity": "medium",
+  "identifiers": [
+   {
+    "value": "GHSA-32m5-wc28-ghrr",
+    "type": "GHSA"
+   }
+  ],
+  "state": "published",
+  "created_at": null,
+  "updated_at": "2026-09-18T17:56:15Z",
+  "published_at": "2026-09-18T17:56:14Z",
+  "closed_at": null,
+  "withdrawn_at": null,
+  "submission": null,
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "7.1.0 - 7.1",
+    "patched_versions": "7.1.1",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "7.0.0 - 7.0.4",
+    "patched_versions": "7.0.5",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.9.0 - 6.9.7",
+    "patched_versions": "6.9.8",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.8.0 - 6.8.8",
+    "patched_versions": "6.8.9",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.7.0 - 6.7.7",
+    "patched_versions": "6.7.8",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.6.0 - 6.6.7",
+    "patched_versions": "6.6.8",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.5.0 - 6.5.10",
+    "patched_versions": "6.5.11",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.4.0 - 6.4.10",
+    "patched_versions": "6.4.11",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.3.0 - 6.3.10",
+    "patched_versions": "6.3.11",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.2.0 - 6.2.11",
+    "patched_versions": "6.2.12",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.1.0 - 6.1.12",
+    "patched_versions": "6.1.13",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.0.0 - 6.0.14",
+    "patched_versions": "6.0.15",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.9.0 - 5.9.16",
+    "patched_versions": "5.9.17",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.8.0 - 5.8.15",
+    "patched_versions": "5.8.16",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.7.0 - 5.7.17",
+    "patched_versions": "5.7.18",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.6.0 - 5.6.19",
+    "patched_versions": "5.6.20",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.5.0 - 5.5.20",
+    "patched_versions": "5.5.21",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.4.0 - 5.4.21",
+    "patched_versions": "5.4.22",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.3.0 - 5.3.23",
+    "patched_versions": "5.3.24",
+    "vulnerable_functions": []
+   }
+  ],
+  "cvss_severities": {
+   "cvss_v3": {
+    "vector_string": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N",
+    "score": 4.3
+   },
+   "cvss_v4": {
+    "vector_string": null,
+    "score": null
+   }
+  },
+  "cwes": [],
+  "cwe_ids": [],
+  "collaborating_teams": null,
+  "private_fork": null,
+  "comments": 0,
+  "cvss": {
+   "vector_string": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:L/A:N",
+   "score": 4.3
+  }
+ },
+ {
+  "ghsa_id": "GHSA-33wf-p63q-w25f",
+  "cve_id": null,
+  "url": "https://api.github.com/repos/WordPress/wordpress-develop/security-advisories/GHSA-33wf-p63q-w25f",
+  "html_url": "https://github.com/WordPress/wordpress-develop/security/advisories/GHSA-33wf-p63q-w25f",
+  "summary": "Contributor+ Arbitrary Post Overwrite",
+  "description": "A Contributor can overwrite the title, content, and author of a published post by sending a specially crafted request to `wp-admin/post.php`\r\n\r\nWordPress 7.1.1 has been released containing a fix for the vulnerability, and as a courtesy to users on older branches the fix has been backported to all branches back to 4.7.\r\n\r\nDiscovered and responsibly disclosed by Anthropic.",
+  "severity": "medium",
+  "identifiers": [
+   {
+    "value": "GHSA-33wf-p63q-w25f",
+    "type": "GHSA"
+   }
+  ],
+  "state": "published",
+  "created_at": null,
+  "updated_at": "2026-09-18T17:57:08Z",
+  "published_at": "2026-09-18T17:57:08Z",
+  "closed_at": null,
+  "withdrawn_at": null,
+  "submission": null,
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "7.1.0 - 7.1",
+    "patched_versions": "7.1.1",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "7.0.0 - 7.0.4",
+    "patched_versions": "7.0.5",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.9.0 - 6.9.7",
+    "patched_versions": "6.9.8",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.8.0 - 6.8.8",
+    "patched_versions": "6.8.9",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.7.0 - 6.7.7",
+    "patched_versions": "6.7.8",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.6.0 - 6.6.7",
+    "patched_versions": "6.6.8",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.5.0 - 6.5.10",
+    "patched_versions": "6.5.11",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.4.0 - 6.4.10",
+    "patched_versions": "6.4.11",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.3.0 - 6.3.10",
+    "patched_versions": "6.3.11",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.2.0 - 6.2.11",
+    "patched_versions": "6.2.12",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.1.0 - 6.1.12",
+    "patched_versions": "6.1.13",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.0.0 - 6.0.14",
+    "patched_versions": "6.0.15",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.9.0 - 5.9.16",
+    "patched_versions": "5.9.17",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.8.0 - 5.8.15",
+    "patched_versions": "5.8.16",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.7.0 - 5.7.17",
+    "patched_versions": "5.7.18",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.6.0 - 5.6.19",
+    "patched_versions": "5.6.20",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.5.0 - 5.5.20",
+    "patched_versions": "5.5.21",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.4.0 - 5.4.21",
+    "patched_versions": "5.4.22",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.3.0 - 5.3.23",
+    "patched_versions": "5.3.24",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.2.0 - 5.2.26",
+    "patched_versions": "5.2.27",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.1.0 - 5.1.24",
+    "patched_versions": "5.1.25",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.0.0 - 5.0.27",
+    "patched_versions": "5.0.28",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "4.9.0 - 4.9.31",
+    "patched_versions": "4.9.32",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "4.8.0 - 4.8.30",
+    "patched_versions": "4.8.31",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "4.7.0 - 4.7.35",
+    "patched_versions": "4.7.36",
+    "vulnerable_functions": []
+   }
+  ],
+  "cvss_severities": {
+   "cvss_v3": {
+    "vector_string": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N",
+    "score": 6.5
+   },
+   "cvss_v4": {
+    "vector_string": null,
+    "score": null
+   }
+  },
+  "cwes": [],
+  "cwe_ids": [],
+  "collaborating_teams": null,
+  "private_fork": null,
+  "comments": 0,
+  "cvss": {
+   "vector_string": "CVSS:3.1/AV:N/AC:L/PR:L/UI:N/S:U/C:N/I:H/A:N",
+   "score": 6.5
+  }
+ },
+ {
+  "ghsa_id": "GHSA-7hp8-65ch-5whp",
+  "cve_id": "CVE-2026-87902",
+  "url": "https://api.github.com/repos/WordPress/wordpress-develop/security-advisories/GHSA-7hp8-65ch-5whp",
+  "html_url": "https://github.com/WordPress/wordpress-develop/security/advisories/GHSA-7hp8-65ch-5whp",
+  "summary": "Unauthenticated path traversal in page-template resolution leading to conditional RCE",
+  "description": "An unauthenticated attacker can make `get_page_template()` page-template resolution include a chosen readable local `.php` file outside the active theme directories. If relevant pre-conditions for both the server environment and the active theme are met, this can lead to RCE.\r\n\r\nThe pre-conditions are:\r\n\r\n* The active child or parent theme contains a top-level directory whose name starts with `page-` (e.g. `page-templates`). This affects the legacy Twenty Twelve and Twenty Fourteen themes, as well as some popular third party themes such as Neve, Hestia, and Sydney.\r\n* A chosen local `.php` target file exists on the server and is readable by the web server account. The well known `pearcmd.php` PEAR→RCE transition can be used for this when `register_argc_argv` is set to `On`. The official `php` image for Docker is affected, and the default cPanel configuration is affected when PHP prior to 8.5 is in use.\r\n\r\nWordPress 7.1.2 has been released containing a fix for the vulnerability, and as a courtesy to users on older branches the fix has been backported to all branches back to 4.7.\r\n\r\nDiscovered and responsibly disclosed by [Robert Ressl](https://ressl.ch/).",
+  "severity": "critical",
+  "identifiers": [
+   {
+    "value": "GHSA-7hp8-65ch-5whp",
+    "type": "GHSA"
+   },
+   {
+    "value": "CVE-2026-87902",
+    "type": "CVE"
+   }
+  ],
+  "state": "published",
+  "created_at": null,
+  "updated_at": "2026-09-22T14:24:56Z",
+  "published_at": "2026-09-22T13:57:27Z",
+  "closed_at": null,
+  "withdrawn_at": null,
+  "submission": null,
+  "vulnerabilities": [
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "7.1.0 - 7.1.1",
+    "patched_versions": "7.1.2",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "7.0.0 - 7.0.5",
+    "patched_versions": "7.0.6",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.9.0 - 6.9.8",
+    "patched_versions": "6.9.9",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.8.0 - 6.8.9",
+    "patched_versions": "6.8.10",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.7.0 - 6.7.8",
+    "patched_versions": "6.7.9",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.6.0 - 6.6.8",
+    "patched_versions": "6.6.9",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.5.0 - 6.5.11",
+    "patched_versions": "6.5.12",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.4.0 - 6.4.11",
+    "patched_versions": "6.4.12",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.3.0 - 6.3.11",
+    "patched_versions": "6.3.12",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.2.0 - 6.2.12",
+    "patched_versions": "6.2.13",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.1.0 - 6.1.13",
+    "patched_versions": "6.1.14",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "6.0.0 - 6.0.15",
+    "patched_versions": "6.0.16",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.9.0 - 5.9.17",
+    "patched_versions": "5.9.18",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.8.0 - 5.8.16",
+    "patched_versions": "5.8.17",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.7.0 - 5.7.18",
+    "patched_versions": "5.7.19",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.6.0 - 5.6.20",
+    "patched_versions": "5.6.21",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.5.0 - 5.5.21",
+    "patched_versions": "5.5.22",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.4.0 - 5.4.22",
+    "patched_versions": "5.4.23",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.3.0 - 5.3.24",
+    "patched_versions": "5.3.25",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.2.0 - 5.2.27",
+    "patched_versions": "5.2.28",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.1.0 - 5.1.25",
+    "patched_versions": "5.1.26",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "5.0.0 - 5.0.28",
+    "patched_versions": "5.0.29",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "4.9.0 - 4.9.32",
+    "patched_versions": "4.9.33",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "4.8.0 - 4.8.31",
+    "patched_versions": "4.8.32",
+    "vulnerable_functions": []
+   },
+   {
+    "package": {
+     "ecosystem": "other",
+     "name": "WordPress"
+    },
+    "vulnerable_version_range": "4.7.0 - 4.7.36",
+    "patched_versions": "4.7.37",
+    "vulnerable_functions": []
+   }
+  ],
+  "cvss_severities": {
+   "cvss_v3": {
+    "vector_string": null,
+    "score": null
+   },
+   "cvss_v4": {
+    "vector_string": "CVSS:4.0/AV:N/AC:L/AT:P/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N",
+    "score": 9.2
+   }
+  },
+  "cwes": [
+   {
+    "cwe_id": "CWE-98",
+    "name": "Improper Control of Filename for Include/Require Statement in PHP Program ('PHP Remote File Inclusion')"
+   }
+  ],
+  "cwe_ids": [
+   "CWE-98"
+  ],
+  "collaborating_teams": null,
+  "private_fork": null,
+  "comments": 0,
+  "cvss": {
+   "vector_string": null,
+   "score": null
+  }
+ }
+]

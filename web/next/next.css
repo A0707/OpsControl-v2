@@ -1,0 +1,258 @@
+/*
+ * Console « Parc serveurs » — couche de style dédiée.
+ *
+ * Réutilise les jetons de couleur de /style.css (--bg, --panel, --line, --text,
+ * --red, --orange, --green…) : un seul système de couleurs pour toute
+ * l'application, thèmes sombre et clair inclus, rien n'est codé en dur.
+ *
+ * Toutes les classes sont préfixées `n-` pour pouvoir cohabiter avec
+ * l'interface actuelle sans collision pendant la migration.
+ *
+ * Contrainte : la CSP du serveur est `style-src 'self'`. Aucun style en ligne
+ * dans le HTML ; les seules valeurs calculées (largeur des jauges) sont posées
+ * par CSSOM depuis le script, ce que la CSP autorise.
+ */
+
+/* ---------------------------------------------------------------- base --- */
+.n-app {
+  --n-gap: 14px;
+  --n-radius: 10px;
+  --n-row-pad: 7px;          /* densité compacte par défaut */
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px clamp(12px, 2vw, 28px) 48px;
+  color: var(--text);
+}
+.n-app[data-density='cosy'] { --n-row-pad: 13px; }
+.n-app.n-embedded { max-width: none; padding: 0; }
+.n-app.n-embedded .n-head { display: none; }
+
+.n-visually-hidden {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip-path: inset(50%); white-space: nowrap;
+}
+
+/* Cible de focus visible partout, y compris au clavier seul (WCAG 2.4.7). */
+.n-app :is(button, input, select, a, tr, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* ------------------------------------------------------------- bandeau --- */
+.n-head {
+  display: flex; flex-wrap: wrap; gap: var(--n-gap);
+  align-items: flex-end; justify-content: space-between;
+  margin-bottom: 12px;
+}
+.n-head h1 {
+  margin: 0; font-size: clamp(20px, 2.4vw, 27px); font-weight: 650;
+  letter-spacing: -0.4px; display: flex; align-items: center; gap: 10px;
+}
+.n-count {
+  font-size: var(--fs-small,13px); font-weight: 600; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px; padding: 2px 9px;
+}
+.n-progress { margin: 4px 0 0; color: var(--muted); font-size: var(--fs-small,13px); }
+.n-head-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+
+.n-primary {
+  background: var(--blue); border: 1px solid var(--blue); color: #fff;
+  font-weight: 600; border-radius: 8px; padding: 10px 16px; cursor: pointer;
+}
+.n-primary:hover:not(:disabled) { filter: brightness(1.12); }
+.n-primary:disabled { opacity: 0.55; cursor: progress; }
+
+.n-ghost, .n-select {
+  background: var(--raised); color: var(--text);
+  border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 12px; font: inherit; cursor: pointer; min-height: 38px;
+}
+.n-ghost:hover { background: var(--hover); }
+.n-ghost:disabled { opacity: 0.5; cursor: default; }
+.n-ghost[aria-pressed='true'] { border-color: var(--accent); color: var(--accent); }
+
+.n-banner {
+  margin: 0 0 12px; padding: 11px 14px; border-radius: var(--n-radius);
+  border: 1px solid var(--red); color: var(--red);
+  background: color-mix(in srgb, var(--red) 10%, transparent);
+}
+.n-scope { margin: 0 0 10px; color: var(--muted); font-size: var(--fs-small,13px); }
+.n-scope p { margin: 3px 0; }
+.n-scope b { color: var(--text); }
+
+/* ------------------------------------------------------------ panneau --- */
+.n-panel {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--n-radius); overflow: hidden;
+}
+
+/* --------------------------------------------------- barre d'outils --- */
+/* Collante : sur 84 lignes, les filtres doivent rester à portée de clic. */
+.n-toolbar {
+  position: sticky; top: 0; z-index: 3;
+  display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+  padding: 12px 14px;
+  background: var(--panel); border-bottom: 1px solid var(--line);
+}
+.n-search {
+  flex: 1 1 260px; min-width: 200px; min-height: 38px;
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--line); border-radius: 8px; padding: 9px 12px; font: inherit;
+}
+.n-search::placeholder { color: var(--muted); }
+.n-toolbar-end { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
+
+.n-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.n-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 12px; font: inherit; cursor: pointer; min-height: 34px;
+}
+.n-chip:hover { background: var(--hover); color: var(--text); }
+.n-chip-count {
+  font-size: var(--fs-small,13px); font-weight: 700; font-variant-numeric: tabular-nums;
+  background: var(--raised); border-radius: 999px; padding: 1px 7px;
+}
+/* L'état sélectionné ne repose pas sur la seule couleur (WCAG 1.4.1) :
+   le fond, la bordure et l'épaisseur du texte changent aussi. */
+.n-chip.active { color: var(--text); border-color: var(--accent); font-weight: 600;
+  background: color-mix(in srgb, var(--accent) 16%, transparent); }
+.n-chip.critical .n-chip-count { color: var(--red); }
+.n-chip.unreachable .n-chip-count { color: var(--red); }
+.n-chip.warning .n-chip-count { color: var(--orange); }
+.n-chip.ok .n-chip-count { color: var(--green); }
+
+.n-summary { margin: 0; padding: 8px 14px; font-size: var(--fs-small,13px); color: var(--muted);
+  border-bottom: 1px solid var(--line); }
+
+/* ------------------------------------------------------------ tableau --- */
+/* Seul le tableau défile horizontalement ; la page, jamais. */
+.n-table-scroll { overflow-x: auto; max-width: 100%; }
+.n-table { width: 100%; border-collapse: collapse; font-size: var(--fs-body,14px); }
+
+/* En-tête collant sous la barre d'outils : on sait toujours quelle colonne on lit. */
+.n-table thead th {
+  position: sticky; top: 0; z-index: 2;
+  background: var(--raised); color: var(--muted);
+  text-align: left; font-weight: 600; font-size: var(--fs-small,13px);
+  letter-spacing: 0.7px; text-transform: uppercase;
+  padding: 0; border-bottom: 1px solid var(--line); white-space: nowrap;
+}
+.n-sort {
+  display: flex; align-items: center; gap: 5px; width: 100%;
+  background: none; border: 0; color: inherit; font: inherit;
+  letter-spacing: inherit; text-transform: inherit;
+  padding: 10px 12px; cursor: pointer;
+}
+.n-sort:hover { color: var(--text); }
+.n-sort-mark { font-size: var(--fs-small,13px); color: var(--accent); }
+.n-table thead th:not(:has(.n-sort)) { padding: 10px 12px; }
+
+.n-table tbody td {
+  padding: var(--n-row-pad) 12px;
+  border-bottom: 1px solid var(--line);
+  vertical-align: middle;
+}
+.n-table tbody tr:hover { background: var(--hover); }
+/* Une preuve ancienne s'affiche en retrait : visible, mais jamais lue comme un état courant. */
+.n-table tbody tr.n-stale td { opacity: 0.72; }
+.n-right { text-align: right; }
+.n-mono { font-variant-numeric: tabular-nums; font-family: ui-monospace, 'Cascadia Mono', Consolas, monospace; }
+.n-mini { font-size: var(--fs-small,13px); color: var(--muted); white-space: nowrap; }
+.n-sub { display: block; font-size: var(--fs-small,13px); color: var(--faint); font-weight: 400; }
+
+.n-link {
+  background: none; border: 0; padding: 0; font: inherit; font-weight: 600;
+  color: var(--text); cursor: pointer; text-align: left;
+}
+.n-link:hover { color: var(--accent); text-decoration: underline; }
+
+/* --------------------------------------------------------- pastilles --- */
+.n-badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--fs-small,13px); font-weight: 600; white-space: nowrap;
+  border: 1px solid var(--line); border-radius: 999px; padding: 3px 9px;
+}
+.n-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.n-badge.ok { color: var(--green); }
+.n-badge.critical, .n-badge.unreachable { color: var(--red); }
+.n-badge.warning { color: var(--orange); }
+.n-badge.unknown { color: var(--muted); }
+
+/* ------------------------------------------------------------- jauges --- */
+.n-num { width: 108px; }
+.n-metric { display: flex; flex-direction: column; gap: 4px; }
+.n-metric-value { font-size: var(--fs-small,13px); font-variant-numeric: tabular-nums; }
+.n-meter {
+  display: block; height: 4px; width: 72px;
+  background: var(--line); border-radius: 3px; overflow: hidden;
+}
+.n-fill { display: block; height: 100%; background: var(--green); border-radius: 3px; }
+.n-meter.warning .n-fill { background: var(--orange); }
+.n-meter.critical .n-fill { background: var(--red); }
+.n-meter.stale .n-fill { opacity: 0.6; }
+
+/* ------------------------------------------------- vide et raccourcis --- */
+.n-empty { padding: 42px 16px; text-align: center; color: var(--muted); }
+.n-shortcuts {
+  margin: 0; padding: 10px 14px; font-size: var(--fs-small,13px); color: var(--faint);
+  border-top: 1px solid var(--line); background: var(--panel);
+}
+.n-shortcuts kbd {
+  font: inherit; font-family: ui-monospace, Consolas, monospace;
+  border: 1px solid var(--line); border-bottom-width: 2px;
+  border-radius: 4px; padding: 1px 5px; margin: 0 2px; color: var(--muted);
+}
+
+/* ------------------------------------------------------- adaptatif --- */
+/* Sous 1100 px on retire les colonnes documentaires : l'état et les mesures
+   priment, et le tableau cesse de défiler horizontalement sur un portable. */
+@media (max-width: 1100px) {
+  .n-table .n-secondary { display: none; }
+}
+@media (max-width: 760px) {
+  .n-app { padding-inline: 12px; }
+  .n-head, .n-head-actions { width: 100%; }
+  .n-head-actions > * { flex: 1 1 auto; }
+  .n-toolbar-end { margin-left: 0; width: 100%; }
+  .n-toolbar-end > * { flex: 1 1 auto; }
+  .n-num { width: auto; }
+  .n-meter { width: 56px; }
+  .n-shortcuts { display: none; }  /* pas de clavier physique attendu ici */
+}
+
+/* Respecte le réglage système : pas d'animation imposée. */
+@media (prefers-reduced-motion: reduce) {
+  .n-app * { animation: none !important; transition: none !important; }
+}
+
+/* Lot 6 — cibles : 24 px sur bureau, 44 px sur mobile et écrans tactiles. */
+.n-link, .n-sort { min-height: 24px; }
+@media (max-width: 680px), (pointer: coarse) {
+  .n-link, .n-ghost, .n-sort, .n-chip, .n-button { min-height: var(--tap, 44px); }
+  .n-link { display: inline-flex; align-items: center; }
+}
+
+/* Largeur réelle du tableau (et non de la fenêtre) : la barre latérale réduit l'espace disponible.
+   Ordre des colonnes : 1 Serveur · 2 IP · 3 Rôle/env. · 4 État · 5 CPU · 6 RAM · 7 Disque · 8 Services ·
+   9 Backup · 10 Couverture · 11 Collecte · 12 Actions. L'état, les mesures et l'âge de la collecte
+   restent toujours visibles ; les colonnes documentaires cèdent la place en premier. */
+.n-table-scroll { container-type: inline-size; }
+@container (max-width: 1560px) {
+  .n-table tbody td.n-mini { white-space: normal; }
+  .n-table tbody td:nth-child(9), .n-table tbody td:nth-child(11) { max-width: 150px; }
+  .n-table tbody td { padding-inline: 9px; }
+}
+@container (max-width: 1360px) {
+  .n-table th:nth-child(10), .n-table td:nth-child(10) { display: none; }
+}
+@container (max-width: 1180px) {
+  .n-table th:nth-child(3), .n-table td:nth-child(3),
+  .n-table th:nth-child(8), .n-table td:nth-child(8) { display: none; }
+}
+@container (max-width: 1050px) {
+  .n-table th:nth-child(9), .n-table td:nth-child(9) { display: none; }
+}

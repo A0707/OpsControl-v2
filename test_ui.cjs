@@ -1,0 +1,51 @@
+const {chromium,launchOptions}=require('./browser-test.cjs');
+const assert=(ok,msg)=>{if(!ok)throw Error(msg)};
+(async()=>{
+ const browser=await chromium.launch(launchOptions);
+ try{
+  const page=await browser.newPage({viewport:{width:1440,height:1000}});
+  const errors=[];page.on('pageerror',e=>errors.push(e.message));
+  await page.goto((process.env.OPS_URL || 'http://127.0.0.1:8001'));
+  await page.locator('#nav [data-page="WAF / HA"]').click();
+  await page.getByRole('heading',{name:'WAF ModSecurity · 10.77.0.131',exact:true}).waitFor();
+  // Page WAF en onglets : chaque section est vérifiée dans son onglet.
+  assert(await page.locator('[data-waf-tab-button]').count()>=5,'onglets WAF absents');
+  await page.locator('[data-waf-tab-button="traffic"]').click();
+  await page.getByRole('heading',{name:'Politique Fail2ban',exact:true}).waitFor();
+  await page.locator('[data-waf-tab-button="actions"]').click();
+  await page.getByRole('heading',{name:'Certificats SSL/TLS · expiration',exact:true}).waitFor();
+  await page.locator('[data-waf-command]').first().click();
+  await page.locator('#waf-command-form [name=ip]').fill('192.0.2.15');
+  await page.locator('#waf-command-form [name=action]').selectOption('whitelist');
+  await page.locator('#waf-command-form [type=submit]').click();
+  await page.locator('#waf-command-result').getByText(/addignoreip 192\.0\.2\.15/).first().waitFor();
+  if(!(await page.locator('#waf-command-result').textContent()).includes('Non persistante'))throw Error('Whitelist scope missing');
+  await page.locator('#waf-command-form [name=ip]').fill('192.0.2.15; id');
+  await page.locator('#waf-command-form [type=submit]').click();
+  await page.locator('#waf-command-error').filter({hasText:'422'}).waitFor();
+  await page.locator('[data-close-command]').click();
+  await page.locator('[data-waf-tab-button="traffic"]').click();
+  await page.locator('[data-waf-tab-button="actions"]').click();
+  await page.locator('#waf-ban-q').fill('192.0.2.');
+  await page.locator('#waf-ban-q').fill('');
+  await page.locator('[data-waf-tab-button="traffic"]').click();
+  await page.evaluate(()=>window.scrollTo(0,0));
+  await page.screenshot({path:'data/waf-ui.png',fullPage:false});
+  await page.locator('#nav [data-page="Sources"]').click();await page.locator('#v2-hub-tabs [data-go="Connexions API"]').click();
+  await page.getByText('Comment ajouter une API ? Guide pas à pas',{exact:true}).click();
+  await page.getByText('https://VOTRE-PVE:8006/api2/json/cluster/resources',{exact:true}).waitFor();
+  await page.locator('[data-add-api]').click();
+  await page.locator('#connection-form [name=provider]').selectOption('Wazuh');
+  if(!(await page.locator('#provider-hint').textContent()).includes('/manager/status'))throw Error('Wazuh hint missing');
+  await page.locator('[data-close]').click();
+  await page.screenshot({path:'data/api-guide-ui.png',fullPage:true});
+  await page.setViewportSize({width:390,height:844});
+  await page.evaluate(()=>navigate('WAF / HA'));
+  await page.evaluate(()=>window.scrollTo(0,0));
+  await page.locator('[data-waf-tab-button="traffic"]').click();
+  await page.getByRole('heading',{name:'Politique Fail2ban',exact:true}).waitFor();
+  await page.screenshot({path:'data/waf-mobile-ui.png',fullPage:false});
+  if(errors.length)throw Error(errors.join('\n'));
+  console.log('PASS: WAF desktop/mobile, API guide, provider form; no JavaScript errors');
+ }finally{await browser.close()}
+})().catch(e=>{console.error(e);process.exitCode=1});

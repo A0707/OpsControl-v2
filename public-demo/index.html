@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="OpsControl — centralized infrastructure monitoring and operations dashboard. Interactive demo with fictional data.">
+  <meta name="color-scheme" content="dark light">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'none'; object-src 'none'; base-uri 'self'; form-action 'none'">
+  <title>OpsControl — Infrastructure Operations Center</title>
+  <link rel="icon" href="assets/opscontrol-icon.png" type="image/png">
+  <link rel="stylesheet" href="demo.css">
+  <script src="demo.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#content">Aller au contenu</a>
+  <aside class="sidebar">
+    <a class="brand" href="./"><img src="assets/opscontrol-icon.png" alt="" width="48" height="48"><span>Ops<span class="accent">Control</span><small>MONITORING • OPERATIONS • SECURITY</small></span></a>
+    <div class="workspace"><span class="avatar">OC</span><div>Infrastructure Operations<small>Environnement de démonstration</small></div></div>
+    <div class="nav-label">ESPACE DE SUPERVISION</div>
+    <nav aria-label="Navigation principale">
+      <button data-view="overview" aria-current="page"><span aria-hidden="true">◫</span>Vue globale</button>
+      <button data-view="servers"><span aria-hidden="true">▤</span>Parc serveurs</button>
+      <button data-view="security"><span aria-hidden="true">◇</span>Sécurité & alertes</button>
+      <button data-view="backups"><span aria-hidden="true">↺</span>Sauvegardes</button>
+      <button data-view="network"><span aria-hidden="true">⌁</span>Réseau</button>
+      <button data-view="sources"><span aria-hidden="true">⊞</span>Intégrations</button>
+    </nav>
+    <div class="sidebar-bottom"><span class="dot"></span><div>Démo interactive<small>Données fictives · aucune connexion réelle</small></div></div>
+  </aside>
+  <main>
+    <header class="topbar"><span>Infrastructure <span class="slash">/</span> <b id="breadcrumb">Vue globale</b></span><div class="actions"><span class="demo-badge">DÉMONSTRATION</span><button id="theme" aria-label="Activer le thème clair">◐</button><a href="https://github.com/A0707/OpsControl-v2" target="_blank" rel="noopener noreferrer">GitHub ↗</a></div></header>
+    <div class="main-inner">
+      <div class="page-header"><div><div class="eyebrow">INFRASTRUCTURE OPERATIONS CENTER</div><h1 id="page-title">Vue globale</h1><p id="page-description">Votre infrastructure, vos priorités, une seule console.</p></div><button class="primary" id="refresh">↻ Simuler une actualisation</button></div>
+      <div class="demo-note"><span aria-hidden="true">ⓘ</span><span>Explorez OpsControl avec un parc fictif. Les mesures, incidents et sauvegardes sont simulés.</span><span id="snapshot" role="status">Scénario initial</span></div>
+      <section id="content" aria-labelledby="page-title" tabindex="-1"></section>
+      <footer><b>OPSCONTROL</b><span>Centre de supervision & d’exploitation IT</span><span>MONITORING • OPERATIONS • SECURITY</span></footer>
+    </div>
+  </main>
+  <dialog id="server-dialog" aria-labelledby="dialog-title"><div class="panel-head"><h2 id="dialog-title">Serveur</h2><button id="close-dialog" aria-label="Fermer la fiche serveur">Fermer ×</button></div><div id="dialog-content"></div></dialog>
+  <noscript>Activez JavaScript pour explorer cette démonstration.</noscript>
+</body>
+</html>

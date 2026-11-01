@@ -1,0 +1,330 @@
+zabbix_export:
+  version: '6.4'
+  template_groups:
+    - uuid: d1668377fd8644cead4b607d22647ab1
+      name: Templates/Applications
+  templates:
+    - uuid: 7ae476f4e53d442281f10a08f9014f1c
+      template: OpsControl
+      name: 'OpsControl (InfraOps)'
+      description: |
+        Supervision d'OpsControl lui-même : sans elle, une panne ou un gel de l'outil de
+        supervision passe inaperçu (systemd le redémarre, mais ne prévient personne).
+        À lier à l'hôte de la VM OpsControl. Items PASSIFS de l'agent Zabbix installé sur
+        cette VM : /health/ready est lu en local (127.0.0.1:8000), sans passer par nginx ni
+        oauth2-proxy.
+        Prérequis sur la VM :
+        - agent Zabbix (non installé par install-vm.sh) ;
+        - lecture de l'état des sauvegardes SANS accès aux archives (droit de traversée seul) :
+            setfacl -m u:zabbix:x /opt/infraops /opt/infraops/backups
+          last-backup.json est 0644, les archives 0640 (UMask du service de sauvegarde).
+        {$OPSCONTROL.BACKUP.MAXAGE} : âge maximal de la dernière sauvegarde réussie.
+      groups:
+        - name: Templates/Applications
+      macros:
+        - macro: '{$OPSCONTROL.BACKUP.MAXAGE}'
+          value: 26h
+          description: 'Âge maximal de la dernière sauvegarde réussie (timer quotidien à 02:30 + marge)'
+      items:
+        - uuid: 721e136e3105474cb803e81492a77980
+          name: 'OpsControl : processus uvicorn'
+          key: 'proc.num[,infraops,,"uvicorn app:app"]'
+          delay: 1m
+          history: 30d
+          description: 'Nombre de processus uvicorn du compte infraops (attendu : 1).'
+          tags:
+            - tag: component
+              value: opscontrol
+          triggers:
+            - uuid: 42c395def355495aae4ef3ab2b0d70b6
+              expression: 'last(/OpsControl/proc.num[,infraops,,"uvicorn app:app"])=0'
+              name: 'OpsControl : processus absent'
+              priority: DISASTER
+              description: 'Le service infraops ne tourne plus : plus aucune collecte ni alerte OpsControl. journalctl -u infraops -n 100'
+        - uuid: 42a857824d964173aaa42cd0410f45ad
+          name: 'OpsControl : état de préparation (/health/ready)'
+          key: 'web.page.regexp[127.0.0.1,/health/ready,8000,"\"status\":\"([a-z_]+)\"",,\1]'
+          delay: 1m
+          history: 30d
+          value_type: CHAR
+          description: 'ready = base lisible et planificateur actif ; not_ready = détail dans /health/ready.'
+          tags:
+            - tag: component
+              value: opscontrol
+          triggers:
+            - uuid: da17667597cf442f88a5282ff65f979f
+              expression: 'find(/OpsControl/web.page.regexp[127.0.0.1,/health/ready,8000,"\"status\":\"([a-z_]+)\"",,\1],3m,"regexp","^ready$")=0'
+              name: 'OpsControl : pas prêt depuis 3 minutes'
+              priority: HIGH
+              description: 'Base illisible ou planificateur arrêté : les données affichées vieillissent. curl -s http://127.0.0.1:8000/health/ready'
+              dependencies:
+                - name: 'OpsControl : processus absent'
+                  expression: 'last(/OpsControl/proc.num[,infraops,,"uvicorn app:app"])=0'
+            - uuid: 29c959fb3e024bcab221646abe7b53b7
+              expression: 'nodata(/OpsControl/web.page.regexp[127.0.0.1,/health/ready,8000,"\"status\":\"([a-z_]+)\"",,\1],5m)=1'
+              name: 'OpsControl : /health/ready ne répond plus depuis 5 minutes'
+              priority: HIGH
+              description: 'Processus présent mais HTTP muet : gel probable (boucle bloquée, verrou SQLite).'
+              dependencies:
+                - name: 'OpsControl : processus absent'
+                  expression: 'last(/OpsControl/proc.num[,infraops,,"uvicorn app:app"])=0'
+        - uuid: be0ef86d0b56490a93cf805533880dbb
+          name: 'OpsControl : dernière sauvegarde réussie'
+          key: 'vfs.file.regexp[/opt/infraops/backups/last-backup.json,"\"last_success_epoch\": ([0-9]+)",,,,\1]'
+          delay: 10m
+          history: 90d
+          units: unixtime
+          description: 'Écrit par deploy/backup_state.py ; n''avance qu''en cas de succès.'
+          tags:
+            - tag: component
+              value: backup
+          triggers:
+            - uuid: 41ba5417794b4e579ddd0b01b445a86c
+              expression: 'now()-last(/OpsControl/vfs.file.regexp[/opt/infraops/backups/last-backup.json,"\"last_success_epoch\": ([0-9]+)",,,,\1])>{$OPSCONTROL.BACKUP.MAXAGE}'
+              name: 'OpsControl : aucune sauvegarde réussie depuis plus de {$OPSCONTROL.BACKUP.MAXAGE}'
+              priority: HIGH
+              description: 'systemctl status infraops-backup.timer ; journalctl -u infraops-backup -n 50 ; cat /opt/infraops/backups/last-backup.json'
+            - uuid: 5011575e0c95492788e27d6c2fbbb4b1
+              expression: 'nodata(/OpsControl/vfs.file.regexp[/opt/infraops/backups/last-backup.json,"\"last_success_epoch\": ([0-9]+)",,,,\1],30h)=1'
+              name: 'OpsControl : état des sauvegardes illisible'
+              priority: WARNING
+              description: 'last-backup.json absent, illisible par l''agent (ACL), ou jamais aucune sauvegarde réussie.'
+        - uuid: 8f167b96a3724f4c9a9a92cb5ea2ea70
+          name: 'OpsControl : résultat de la dernière sauvegarde'
+          key: 'vfs.file.regexp[/opt/infraops/backups/last-backup.json,"\"ok\": (true|false)",,,,\1]'
+          delay: 10m
+          history: 90d
+          value_type: CHAR
+          tags:
+            - tag: component
+              value: backup
+        - uuid: da07b7bf916d4ee08600e190bca33232
+          name: 'OpsControl : test de restauration de la dernière sauvegarde'
+          key: 'vfs.file.regexp[/opt/infraops/backups/last-backup.json,"\"restore_test_ok\": (true|false)",,,,\1]'
+          delay: 10m
+          history: 90d
+          value_type: CHAR
+          description: 'Écrit par deploy/restore_state.py verify --record, lancé après chaque sauvegarde (infraops-backup.service).'
+          tags:
+            - tag: component
+              value: backup
+          triggers:
+            - uuid: 00e27ff091ad4ac08f84b0aaf65a553b
+              expression: 'last(/OpsControl/vfs.file.regexp[/opt/infraops/backups/last-backup.json,"\"restore_test_ok\": (true|false)",,,,\1])="false"'
+              name: 'OpsControl : la dernière sauvegarde ne se restaure pas'
+              priority: HIGH
+              description: 'Archive altérée ou base illisible : la sauvegarde n''est pas fiable. journalctl -u infraops-backup -n 50 ; cat /opt/infraops/backups/last-backup.json (restore_test_error).'
+        # --- Indicateurs de service (SLI) : /api/metrics lu en local (INFRAOPS_METRICS=1) -----
+        - uuid: 2ed3639a2bf44df2a569d958237a607d
+          name: 'OpsControl : métriques (brut)'
+          key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          delay: 1m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Page Prometheus complète, non conservée ; source des indicateurs dépendants. Bloquée par nginx depuis l''extérieur.'
+          tags:
+            - tag: component
+              value: slo
+        - uuid: d5761fa05a7f40d4b8ac78c3cf436d1b
+          name: 'SLI : latence p95 des API (5 min)'
+          type: DEPENDENT
+          key: opscontrol.http.p95
+          delay: '0'
+          history: 90d
+          value_type: FLOAT
+          units: s
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\r?\n\r?\n([\s\S]*)'
+                - '\1'
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - opscontrol_http_p95_seconds_window
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          tags:
+            - tag: component
+              value: slo
+          triggers:
+            - uuid: 1858e5bff5854364bfb9ac4ba69e6277
+              expression: 'min(/OpsControl/opscontrol.http.p95,15m)>0.3'
+              name: 'SLO latence : p95 des API > 300 ms depuis 15 min'
+              priority: WARNING
+              description: 'Objectif : p95 < 300 ms (docs/SLO.md). Pistes : collecte complète en cours, verrou SQLite, base volumineuse (deploy/maintenance.py vacuum).'
+        - uuid: 260718bd0e9142888f5bb0f19cf233f5
+          name: 'SLI : part de réponses 5xx des API (5 min)'
+          type: DEPENDENT
+          key: opscontrol.http.5xx_ratio
+          delay: '0'
+          history: 90d
+          value_type: FLOAT
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\r?\n\r?\n([\s\S]*)'
+                - '\1'
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - opscontrol_http_5xx_ratio_window
+                - value
+                - ''
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          tags:
+            - tag: component
+              value: slo
+        - uuid: a43a7220b13043239215371f7ab40162
+          name: 'SLI : requêtes API (5 min)'
+          type: DEPENDENT
+          key: opscontrol.http.requests
+          delay: '0'
+          history: 30d
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\r?\n\r?\n([\s\S]*)'
+                - '\1'
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - opscontrol_http_requests_window
+                - value
+                - ''
+              error_handler: CUSTOM_VALUE
+              error_handler_params: '0'
+          master_item:
+            key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          tags:
+            - tag: component
+              value: slo
+        - uuid: 924e79360f534bbe98bebc6f8f99685c
+          name: 'SLI : serveurs en inventaire'
+          type: DEPENDENT
+          key: opscontrol.hosts
+          delay: '0'
+          history: 90d
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\r?\n\r?\n([\s\S]*)'
+                - '\1'
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - opscontrol_hosts
+                - value
+                - ''
+          master_item:
+            key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          tags:
+            - tag: component
+              value: slo
+        - uuid: a92e6f79911044ecbd5d588b39866066
+          name: 'SLI : serveurs audités en SSH depuis moins de 24 h'
+          type: DEPENDENT
+          key: opscontrol.hosts.ssh_24h
+          delay: '0'
+          history: 90d
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\r?\n\r?\n([\s\S]*)'
+                - '\1'
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - opscontrol_hosts_ssh_24h
+                - value
+                - ''
+          master_item:
+            key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          tags:
+            - tag: component
+              value: slo
+        - uuid: 13c49b8c205a4ed5a8d577698a8e434d
+          name: 'SLI : serveurs avec sonde réseau récente (15 min)'
+          type: DEPENDENT
+          key: opscontrol.hosts.network_fresh
+          delay: '0'
+          history: 90d
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\r?\n\r?\n([\s\S]*)'
+                - '\1'
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - opscontrol_hosts_network_fresh
+                - value
+                - ''
+          master_item:
+            key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          tags:
+            - tag: component
+              value: slo
+        - uuid: 7e620c8842b349aa9b2da779d41f83f9
+          name: 'SLI : sources API récentes (15 min)'
+          type: DEPENDENT
+          key: opscontrol.sources.fresh
+          delay: '0'
+          history: 90d
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\r?\n\r?\n([\s\S]*)'
+                - '\1'
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - opscontrol_source_fresh
+                - function
+                - sum
+          master_item:
+            key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          tags:
+            - tag: component
+              value: slo
+        - uuid: 38abbfc9e36c40b0a2b305bc1f08d52e
+          name: 'SLI : sources API configurées'
+          type: DEPENDENT
+          key: opscontrol.sources.total
+          delay: '0'
+          history: 90d
+          preprocessing:
+            - type: REGEX
+              parameters:
+                - '\r?\n\r?\n([\s\S]*)'
+                - '\1'
+            - type: PROMETHEUS_PATTERN
+              parameters:
+                - opscontrol_source_fresh
+                - function
+                - count
+          master_item:
+            key: 'web.page.get[127.0.0.1,/api/metrics,8000]'
+          tags:
+            - tag: component
+              value: slo
+  triggers:
+    - uuid: e3a9362802954402b7a8165a55d5fc82
+      expression: 'min(/OpsControl/opscontrol.http.5xx_ratio,15m)>0.005 and min(/OpsControl/opscontrol.http.requests,15m)>=20'
+      name: 'SLO erreurs : plus de 0,5 % de réponses 5xx depuis 15 min'
+      priority: HIGH
+      description: 'Objectif : 5xx < 0,5 % (docs/SLO.md), sur un volume d''au moins 20 requêtes. Chercher les request_id en erreur : journalctl -u infraops | grep ''"status": 5'''
+    - uuid: bede8fcef3c04a1e9c9ce3ffef4bc771
+      expression: 'max(/OpsControl/opscontrol.hosts.ssh_24h,1h)<0.9*last(/OpsControl/opscontrol.hosts)'
+      name: 'SLO fraîcheur SSH : moins de 90 % du parc audité depuis 24 h'
+      priority: WARNING
+      description: 'Lancer une collecte complète ou activer le réaudit en rotation ; vérifier les échecs d''authentification et d''empreinte (fiches serveur).'
+    - uuid: 7f4c324c086448c889115a7ccbde6fa4
+      expression: 'max(/OpsControl/opscontrol.hosts.network_fresh,30m)<0.9*last(/OpsControl/opscontrol.hosts)'
+      name: 'SLO disponibilité mesurée : moins de 90 % du parc sondé depuis 15 min'
+      priority: WARNING
+      description: 'Intervalle d''actualisation à 0 (manuel) ou sondes réseau en échec.'
+    - uuid: da1f2eca9066494e81209d0cad117a09
+      expression: 'max(/OpsControl/opscontrol.sources.fresh,30m)<last(/OpsControl/opscontrol.sources.total)'
+      name: 'SLO sources : au moins une source API sans lecture réussie depuis 30 min'
+      priority: WARNING
+      description: 'Page Sources d''OpsControl : erreur par source (jeton, TLS, liaison jeton/hôte). docs/RUNBOOK.md §2.'

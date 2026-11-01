@@ -1,0 +1,34 @@
+# Exemple entièrement synthétique : les adresses RFC 5737 ne sont pas un parc réel.
+ssh:
+  users: [infraops, audit]
+  ports: [22, 2222]
+  transport: openssh
+  key_path: ~/.ssh/id_ed25519
+  timeout: 6
+  strict_host_key: true
+
+# Champs facultatifs lus par la veille sécurité (docs/SECURITE-CVE.md) :
+#   exposure: internet        serveur exposé à Internet hors WAF (alertes « service exposé »)
+#   firmware_version: 7.4.8   FortiGate : version FortiOS DÉCLARÉE (jamais mieux que « potentielle »)
+hosts:
+  - key: demo-web
+    name: Serveur web de démonstration
+    ip: 192.0.2.10
+    environment: DEMO
+    role: Web
+    collect_enabled: false
+    services: [nginx.service]
+  - key: demo-db
+    name: Base de données de démonstration
+    ip: 198.51.100.20
+    environment: DEMO
+    role: Base de données
+    collect_enabled: false
+    services: [postgresql.service]
+  - key: demo-backup
+    name: Sauvegarde de démonstration
+    ip: 203.0.113.30
+    environment: DEMO
+    role: Sauvegarde
+    collect_enabled: false
+    services: [bacula-fd.service]

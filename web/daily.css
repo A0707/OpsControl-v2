@@ -1,0 +1,16 @@
+.daily-columns{display:grid;grid-template-columns:1.3fr 1fr;gap:18px;align-items:start}
+.daily-sources{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}
+.daily-sources .card{min-width:0;padding:16px}.daily-sources p{overflow-wrap:anywhere}
+#batch-results .batch-wrap{max-width:260px;min-width:160px;white-space:normal;overflow-wrap:anywhere}#batch-results small.batch-wrap{display:block;min-width:0}.batch-inv-filter[hidden]{display:none}#batch-results [data-batch-entry] td:first-child{min-width:190px}#batch-results [data-batch-entry] .badge{white-space:normal}#batch-results .batch-lines{max-width:420px;max-height:220px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;font-size:var(--fs-meta,12px);background:var(--raised);padding:6px;border-radius:4px}#batch-results small.batch-cause{display:block;color:var(--red);overflow-wrap:anywhere;max-width:280px}#batch-results .batch-findings{list-style:none;margin:6px 0 0;padding:0;min-width:220px}#batch-results .batch-findings li{margin:3px 0;font-size:var(--fs-meta,12px)}
+#batch-results td small{max-width:320px;white-space:normal}
+#batch-results caption{text-align:left;padding:12px;caption-side:top;white-space:normal}
+#content .filters label{display:flex;flex-direction:column;gap:5px}
+.page-guide{margin-top:18px}
+/* White normal-size text needs at least 4.5:1 on primary controls. */
+:root[data-theme=dark]{--blue:#2868d8}
+.primary:hover{filter:none;background:#235ebd}
+/* Text remains readable in dense daily views; controls keep a visible focus. */
+#daily-data .note,#daily-data small,#batch-results .note,#batch-results td{font-size:var(--fs-small,13px)}
+#daily-data button,#batch-refresh,#batch-results button,#batch-kind,#batch-state{min-height:var(--tap,44px)}
+@media(max-width:900px){.daily-columns{grid-template-columns:1fr}}
+@media(max-width:680px){.daily-sources{grid-template-columns:1fr}#daily-data .stats{grid-template-columns:repeat(2,minmax(0,1fr))}#batch-results button{min-height:44px}}

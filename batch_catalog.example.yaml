@@ -1,0 +1,37 @@
+# Exemple de référentiel des batchs métier (valeurs fictives).
+# Copier vers data/batch_catalog.yaml (hors Git) ou pointer INFRAOPS_BATCH_CATALOG
+# vers un autre chemin. Le fichier est relu à chaque affichage de la page Batch.
+#
+# Champs (tous facultatifs sauf « nom ») :
+#   nom, responsable, serveur (IP de l'inventaire, ou SWARM…),
+#   scripts            liste de chemins absolus ; un chemin finissant par « / » désigne un dossier
+#   properties, envoi_mail, horaire (texte : « 02:30 », « 08:00, 12:00 », « 06-18:00 »…),
+#   criticite (entier), commentaire, langage, cree_le, mise_en_production, migration,
+#   statut (« En prod », « Désactivé »…), validation (« Oui », « Non »…),
+#   attendu            actif | arrete — par défaut « arrete » si le statut commence par Désactivé.
+batchs:
+  - nom: Import des factures
+    responsable: Équipe Finance
+    serveur: 192.0.2.10
+    scripts: [/var/batch/batch_factures/script/runBatchFactures.sh]
+    properties: /var/batch/batch_factures/properties/hikaricp.properties
+    envoi_mail: Relais SMTP interne
+    horaire: "02:30"
+    criticite: 2
+    statut: En prod
+    validation: Oui
+  - nom: Indexation du catalogue
+    responsable: Équipe Recherche
+    serveur: 192.0.2.10
+    scripts: [/var/batch/batch_index/batch-index.jar]
+    properties: application.properties du jar
+    horaire: 06-18:00 (toutes les heures)
+    statut: En prod
+    validation: Non
+  - nom: Ancien export
+    responsable: Équipe Data
+    serveur: 192.0.2.20
+    scripts: [/var/batch/batch_export_ancien/]
+    horaire: "04:00"
+    commentaire: Remplacé par le nouvel export
+    statut: Désactivé

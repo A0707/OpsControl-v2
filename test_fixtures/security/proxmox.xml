@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
+  <channel>
+    <language>en-US</language>
+    <title>Announcements</title>
+    <description>General announcements for example new Proxmox products, updates, improvements, events, and so on.</description>
+    <pubDate>Wed, 21 Oct 2026 23:44:19 +0000</pubDate>
+    <lastBuildDate>Wed, 21 Oct 2026 23:44:19 +0000</lastBuildDate>
+    <generator>Proxmox Support Forum</generator>
+    <link>https://forum.proxmox.com/forums/announcements.7/</link>
+    <atom:link rel="self" type="application/rss+xml" href="https://forum.proxmox.com/forums/announcements.7/index.rss"/>
+    <item>
+      <title>Proxmox announces global 24/7 enterprise support and launches Proxmox North America Inc.</title>
+      <pubDate>Wed, 02 Sep 2026 16:28:18 +0000</pubDate>
+      <link>https://forum.proxmox.com/threads/proxmox-announces-global-24-7-enterprise-support-and-launches-proxmox-north-america-inc.186140/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:186140</guid>
+      <author>invalid@example.com (t.lamprecht)</author>
+      <category domain="https://forum.proxmox.com/forums/announcements.7/"><![CDATA[Announcements]]></category>
+      <dc:creator>t.lamprecht</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">We are pleased to share two major milestones that will help us better serve our customers and partners worldwide.<br />
+<br />
+<b>Global 24/7 enterprise support</b><br />
+Starting October 19, 2026, Proxmox Enterprise Support will be available around the clock, 365 days a year, across all time zones. Support will continue to be provided directly by Proxmox engineers, giving customers access to the people who develop and maintain our products. The expanded coverage applies to Proxmox Virtual Environment, Proxmox...<br />
+<br />
+<a href="https://forum.proxmox.com/threads/proxmox-announces-global-24-7-enterprise-support-and-launches-proxmox-north-america-inc.186140/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>0</slash:comments>
+    </item><item>
+      <title>Proxmox Virtual Environment now available for 64-bit ARM (arm64)!</title>
+      <pubDate>Wed, 05 Aug 2026 09:32:47 +0000</pubDate>
+      <link>https://forum.proxmox.com/threads/proxmox-virtual-environment-now-available-for-64-bit-arm-arm64.185526/</link>
+      <guid isPermaLink="false">urn:xenforo:thread:185526</guid>
+      <author>invalid@example.com (t.lamprecht)</author>
+      <category domain="https://forum.proxmox.com/forums/announcements.7/"><![CDATA[Announcements]]></category>
+      <dc:creator>t.lamprecht</dc:creator>
+      <content:encoded><![CDATA[<div class="bbWrapper">We are excited to announce the first release of Proxmox Virtual Environment with official support for a second CPU architecture: 64-bit ARM (arm64/aarch64). Until now, Proxmox VE was available for x86-64 (amd64) only.<br />
+<br />
+Proxmox VE 9.2 for arm64 shares the code base, package repositories, and release lifecycle with its x86-64 counterpart. It is built on Debian 13.5 &quot;Trixie&quot; with Linux kernel 7.0 as the stable default, and ships the same versions of our underlying key technologies, including...<br />
+<br />
+<a href="https://forum.proxmox.com/threads/proxmox-virtual-environment-now-available-for-64-bit-arm-arm64.185526/" class="link link--internal">Read more</a></div>]]></content:encoded>
+      <slash:comments>0</slash:comments>
+    </item></channel>
+</rss>

@@ -1,0 +1,38 @@
+# Operational data must stay on this workstation.
+/data/
+/dist/
+/hosts.yaml*
+/inventory-report.json
+*.log
+*.log.*
+*.sqlite3*
+*.db
+*.xlsx
+*.pem
+*.key
+.env
+.env.*
+!.env.example
+__pycache__/
+*.py[cod]
+.venv/
+.ruff_cache/
+node_modules/
+.idea/
+.claude/
+.codex/
+.agents/
+graphify-out/
+*.avant*
+*.before-*
+# Sauvegardes locales (deploy/backup_state.py) : contiennent la base.
+/backups/
+# Outillage local, hors application.
+.graphify-packages/
+# Dépôt public distinct (contient son propre .git).
+/release/
+# Certificat de test public (aucune clé privée), requis par les tests.
+!/test_fixtures/tls/*.pem
+# Journal synthétique de test ; les journaux d'exploitation restent exclus.
+!/test_fixtures/waf/error.log
+!/test_fixtures/waf/*.log.tpl

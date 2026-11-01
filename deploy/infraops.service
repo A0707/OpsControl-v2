@@ -1,0 +1,58 @@
+[Unit]
+Description=InfraOps - supervision et audit en lecture seule
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=infraops
+Group=infraops
+# Code : release versionnée active (lien atomique géré par deploy/release.py).
+WorkingDirectory=/opt/infraops/current
+# Secrets (jetons API, INFRAOPS_WEBHOOK_TOKEN, INFRAOPS_TRUSTED_PROXY_SECRET) : 0640 root:infraops.
+# Remplace le coffre DPAPI, qui n'existe que sous Windows.
+EnvironmentFile=/etc/infraops/secrets.env
+Environment=INFRAOPS_AUTO_INTERVAL=60
+# /api/metrics : lu en local par l'agent Zabbix (SLO, modèle OpsControl) ; bloqué par nginx.
+Environment=INFRAOPS_METRICS=1
+# Clé dédiée au service (générée par install-vm.sh) ; hosts.yaml indique ~/.ssh/id_rsa, celle du PC.
+Environment=COCKPIT_SSH_KEY=/opt/infraops/.ssh/id_ed25519
+# Données partagées hors release : jamais remplacées par un déploiement.
+Environment=COCKPIT_DB=/opt/infraops/data/state.sqlite3
+Environment=COCKPIT_AUDIT=/opt/infraops/audit.log
+# Politique d'accès (access_policy.py). En-tête Host accepté : nom public du proxy et boucle locale.
+Environment=INFRAOPS_ALLOWED_HOSTS=infraops.example.test,127.0.0.1,localhost
+# Rôles des identités transmises par oauth2-proxy : admin et operator par liste, viewer sinon.
+# À renseigner dans /etc/infraops/secrets.env (INFRAOPS_ADMINS=a@example.test,b@example.test ; INFRAOPS_OPERATORS=…).
+Environment=INFRAOPS_DEFAULT_ROLE=viewer
+# Identité opérateur : acceptée seulement si nginx présente INFRAOPS_TRUSTED_PROXY_SECRET
+# (défini dans secrets.env). En accès direct à uvicorn, le mode reste local non authentifié.
+# Proxy obligatoire : sans secret valide (32 caractères minimum), le service refuse de
+# démarrer au lieu de basculer en « local admin » pour tout utilisateur du proxy.
+Environment=INFRAOPS_REQUIRE_PROXY=1
+# Tunnel Bacula : compte autorisé sur le serveur de sauvegarde avec la clé du service.
+# Environment=INFRAOPS_BACULA_TUNNEL_TARGET=infraops@10.77.0.148
+# Écoute locale uniquement : nginx est le seul point d'entrée réseau.
+# --proxy-headers : InfraOps compare l'Origin des POST à son URL de base ; sans
+# les en-têtes du proxy, il verrait http://127.0.0.1:8000 et refuserait tout.
+# --workers 1 : l'état temps réel (voie rapide, SSE) vit dans le processus.
+ExecStart=/opt/infraops/current/.venv/bin/uvicorn app:app --host 127.0.0.1 --port 8000 --workers 1 --proxy-headers --forwarded-allow-ips 127.0.0.1
+Restart=always
+RestartSec=5
+# Durcissement : tout le système en lecture seule sauf /opt/infraops. Le dossier
+# entier et non data/ seul : l'inventaire (hosts.yaml) s'écrit de façon atomique,
+# via un fichier temporaire créé dans son propre dossier.
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/infraops
+# Code des releases (et donc current/) en lecture seule, en plus des droits root:infraops
+# posés par install-vm.sh : une compromission du service ne modifie pas le code exécuté.
+ReadOnlyPaths=/opt/infraops/releases
+PrivateTmp=yes
+# ICMP (ping) sans root pour la sonde de la voie rapide.
+AmbientCapabilities=CAP_NET_RAW
+CapabilityBoundingSet=CAP_NET_RAW
+
+[Install]
+WantedBy=multi-user.target
