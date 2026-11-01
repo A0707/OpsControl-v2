@@ -1,5 +1,11 @@
 # Journal des modifications
 
+## 2026-11-01 — Démo publique et signature
+
+- Activation de GitHub Pages pour la vitrine statique, avec HTTPS.
+- Ajout du crédit « by Achraf BELASRI » au README et au pied de page de la démo.
+- Description et lien de la démo renseignés dans la présentation du dépôt.
+
 ## 2026-11-01 — Édition publique initiale
 
 - Publication du socle Python/FastAPI et de l'interface française.

@@ -9,6 +9,9 @@ Les noms d'utilisateurs de test sont fictifs. Les adresses `10.77.0.0/24` prése
 dans certains tests servent uniquement aux scénarios RFC1918 ; elles ne constituent
 pas un inventaire à scanner. La démo statique utilise les plages RFC 5737.
 
+Le crédit public de l'auteur figure volontairement dans le README et la démo,
+à sa demande. Les références techniques de l'environnement restent anonymisées.
+
 Les captures et ressources de démonstration sont indépendantes des vues d'exploitation.
 Les fichiers PNG distribués sont débarrassés des métadonnées textuelles, EXIF et dates.
 Les fixtures de veille peuvent citer des organismes et adresses de contact publics.

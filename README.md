@@ -1,6 +1,7 @@
 <p align="center"><img src="public-demo/assets/opscontrol-logo.png" alt="OpsControl v2" width="620"></p>
 
 <h1 align="center">OpsControl v2</h1>
+<p align="center">by Achraf BELASRI</p>
 <p align="center"><strong>Un cockpit pour la supervision, l'exploitation et la sécurité IT.</strong><br>MONITORING · OPERATIONS · SECURITY</p>
 <p align="center"><a href="https://a0707.github.io/OpsControl-v2/">Démo interactive</a> · <a href="ROADMAP.md">Roadmap</a> · <a href="docs/ARCHITECTURE.md">Architecture</a> · <a href="SECURITY.md">Sécurité</a> · <a href="CONTRIBUTING.md">Contribuer</a></p>
 
@@ -16,7 +17,7 @@ explicitement activées sont distinctes des collectes d'infrastructure.
 
 ## Essayer sans infrastructure
 
-La [démo publique](https://a0707.github.io/OpsControl-v2/), après [activation de Pages](docs/GITHUB-SETUP.md), présente 12 serveurs fictifs,
+La [démo publique](https://a0707.github.io/OpsControl-v2/) présente 12 serveurs fictifs,
 des incidents, des métriques, des sauvegardes et des sources simulées. Les filtres,
 fiches serveurs, thèmes clair/sombre et actualisations simulées fonctionnent localement.
 Elle n'appelle aucune API d'exploitation et ne demande aucun identifiant.
